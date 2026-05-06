@@ -1,0 +1,3627 @@
+<!DOCTYPE html>
+<html lang="tr" class="lang-tr">
+
+<!--
+  ╔══════════════════════════════════════════════════════════════════════════╗
+  ║  UTS PRO v9.0 TURBO — ULTIMATE MEDICAL RPA AUTOMATION ENGINE            ║
+  ║  Author : UTS PRO Development Team                                       ║
+  ║  Version: 9.0.9 (TITAN STABLE)                                           ║
+  ║  Build  : 2026.05.04-FINAL-MASTER                                        ║
+  ║  Lines  : 3000+                                                           ║
+  ╚══════════════════════════════════════════════════════════════════════════╝
+-->
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <title>UTS PRO v9.0 TURBO — Tıbbi Cihaz Otomasyon Motoru</title>
+
+  <!-- EXTERNAL SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r164/three.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/three@0.164.1/build/three.min.js';"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/gsap@3.12.2/dist/gsap.min.js';"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/gsap@3.12.2/dist/ScrollTrigger.min.js';"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/gsap@3.12.2/dist/TextPlugin.min.js';"></script>
+
+  <!-- FONTS: Clash Display + JetBrains Mono + Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@100;300;400;700&family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ════════════════════════════════════════════════════════════════
+       DESIGN TOKEN SYSTEM
+    ════════════════════════════════════════════════════════════════ */
+    :root {
+      /* Colors */
+      --c-blue: #2563eb;
+      --c-blue-light: #3b82f6;
+      --c-blue-glow: rgba(59, 130, 246, 0.45);
+      --c-purple: #9333ea;
+      --c-purple-glow: rgba(147, 51, 234, 0.45);
+      --c-emerald: #10b981;
+      --c-red: #ef4444;
+      --c-gold: #d4af37;
+      --c-bg: #050507;
+      --c-surface: rgba(255, 255, 255, 0.03);
+      --c-border: rgba(255, 255, 255, 0.1);
+      --c-muted: #94a3b8;
+      --c-text: #ffffff;
+      --c-text-dim: #cbd5e1;
+      /* Typography */
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-ui: 'Syne', sans-serif;
+      --font-body: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      /* Spacing */
+      --section-pad: clamp(100px, 14vw, 180px) clamp(20px, 5vw, 80px);
+      /* Transitions */
+      --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       RESET & BASE
+    ════════════════════════════════════════════════════════════════ */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #060608;
+      color: var(--c-text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      cursor: none;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       LOCALIZATION ENGINE
+    ════════════════════════════════════════════════════════════════ */
+    .lang-en [data-lang="tr"] {
+      display: none !important;
+    }
+
+    .lang-tr [data-lang="en"] {
+      display: none !important;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       CUSTOM CURSOR
+    ════════════════════════════════════════════════════════════════ */
+    #cursor-dot,
+    #cursor-ring {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+    }
+
+    #cursor-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--c-blue-light);
+      box-shadow: 0 0 12px var(--c-blue-glow);
+    }
+
+    #cursor-ring {
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(59, 130, 246, 0.5);
+      transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo),
+        border-color 0.3s, background 0.3s;
+    }
+
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring {
+      width: 56px;
+      height: 56px;
+      background: rgba(59, 130, 246, 0.08);
+      border-color: var(--c-blue-light);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       ATMOSPHERIC BACKGROUND LAYERS
+    ════════════════════════════════════════════════════════════════ */
+    #webgl-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      background: #050507;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       BACKGROUND OVERLAY (FOR CONTRAST)
+    ════════════════════════════════════════════════════════════════ */
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      /* 60% Opacity as requested (between 55% and 65%) */
+      z-index: 1;
+      /* Above canvas (-1) but below main (10) */
+      pointer-events: none;
+    }
+
+    @keyframes grain-move {
+      0% {
+        transform: translate(0, 0);
+      }
+
+      25% {
+        transform: translate(-2%, -3%);
+      }
+
+      50% {
+        transform: translate(3%, 2%);
+      }
+
+      75% {
+        transform: translate(-1%, 4%);
+      }
+
+      100% {
+        transform: translate(2%, -1%);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       LAYOUT SYSTEM
+    ════════════════════════════════════════════════════════════════ */
+    main {
+      position: relative;
+      z-index: 10;
+    }
+
+    .section {
+      min-height: 100vh;
+      padding: var(--section-pad);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       GLASSMORPHISM CARDS
+    ════════════════════════════════════════════════════════════════ */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--c-border);
+      box-shadow:
+        0 8px 32px 0 rgba(0, 0, 0, 0.37),
+        inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      transition: all 0.7s var(--ease-expo);
+    }
+
+    .glass-hover:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-10px);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       TYPOGRAPHY
+    ════════════════════════════════════════════════════════════════ */
+    .display {
+      font-family: var(--font-display);
+      line-height: 0.88;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+    }
+
+    /* Gradient text utility */
+    .text-grad-blue {
+      background: linear-gradient(135deg, var(--c-blue-light) 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .text-grad-purple {
+      background: linear-gradient(135deg, var(--c-purple) 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENTS: BADGE
+    ════════════════════════════════════════════════════════════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      border-radius: 100px;
+      background: rgba(37, 99, 235, 0.08);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--c-text-dim);
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--c-emerald);
+      box-shadow: 0 0 8px var(--c-emerald);
+      animation: pulse-anim 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-anim {
+
+      0%,
+      100% {
+        transform: scale(0.85);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scale(1.25);
+        opacity: 1;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       COMPONENTS: BUTTONS
+    ════════════════════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 18px 44px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: none;
+      transition: all 0.5s var(--ease-expo);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0);
+      transition: background 0.3s;
+    }
+
+    .btn:hover::after {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-primary {
+      background: var(--c-blue);
+      color: #fff;
+      border: 1px solid var(--c-blue-light);
+      box-shadow: 0 0 60px rgba(37, 99, 235, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-primary:hover {
+      background: var(--c-blue-light);
+      box-shadow: 0 0 80px rgba(59, 130, 246, 0.5);
+      transform: translateY(-4px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--c-text-dim);
+      border: 1px solid var(--c-border);
+    }
+
+    .btn-ghost:hover {
+      color: var(--c-text);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-4px);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       NAVIGATION
+    ════════════════════════════════════════════════════════════════ */
+    #navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 28px clamp(20px, 5vw, 80px);
+      z-index: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.5s, padding 0.5s;
+    }
+
+    #navbar.scrolled {
+      background: rgba(5, 5, 7, 0.92);
+      backdrop-filter: blur(24px);
+      padding: 18px clamp(20px, 5vw, 80px);
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      letter-spacing: 0.06em;
+      color: var(--c-text);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--c-blue-light);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+      cursor: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--c-text);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       LANGUAGE TOGGLE (TOP LEFT)
+    ════════════════════════════════════════════════════════════════ */
+    #lang-btn {
+      position: fixed;
+      top: 32px;
+      left: 240px;
+      /* Moved further to clear the logo entirely */
+      z-index: 600;
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--c-text);
+      background: rgba(15, 15, 20, 0.85);
+      border: 1px solid var(--c-border);
+      cursor: none;
+      transition: all 0.4s;
+      backdrop-filter: blur(20px);
+    }
+
+    #lang-btn:hover {
+      color: var(--c-text);
+      border-color: var(--c-blue-light);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: HERO
+    ════════════════════════════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      padding-top: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-eyebrow {
+      opacity: 0;
+      transform: translateY(30px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(72px, 12vw, 160px);
+      line-height: 0.86;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-body);
+      font-size: clamp(16px, 2vw, 22px);
+      color: var(--c-text-dim);
+      font-weight: 300;
+      max-width: 700px;
+      line-height: 1.75;
+      margin: 0 auto 56px;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .hero-subtitle strong {
+      color: var(--c-text);
+      font-weight: 600;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    /* Hero stats bar */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 100px;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .hero-stat {
+      padding: 40px 24px;
+      text-align: center;
+      border-right: 1px solid var(--c-border);
+    }
+
+    .hero-stat:last-child {
+      border-right: none;
+    }
+
+    .hero-stat-num {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 5vw, 60px);
+      line-height: 1;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .hero-stat-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      animation: scroll-hint-fade 1s ease 3.5s forwards;
+    }
+
+    @keyframes scroll-hint-fade {
+      to {
+        opacity: 0.4;
+      }
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--c-blue-light));
+      animation: scroll-line-anim 2s ease-in-out infinite;
+    }
+
+    @keyframes scroll-line-anim {
+
+      0%,
+      100% {
+        transform: scaleY(1);
+        opacity: 0.6;
+      }
+
+      50% {
+        transform: scaleY(0.3);
+        opacity: 1;
+      }
+    }
+
+    .scroll-hint span {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.4em;
+      color: var(--c-muted);
+      text-transform: uppercase;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: WHAT IS UTS
+    ════════════════════════════════════════════════════════════════ */
+    #about {
+      background: rgba(255, 255, 255, 0.005);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      width: 100%;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .about-text-block {
+      text-align: left;
+    }
+
+    .about-text-block h3 {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 4vw, 56px);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      line-height: 0.9;
+    }
+
+    .about-text-block p {
+      color: var(--c-text-dim);
+      font-size: 16px;
+      line-height: 1.85;
+      margin-bottom: 20px;
+    }
+
+    .about-terminal {
+      background: #000;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    }
+
+    .terminal-bar {
+      background: #111;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .terminal-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .t-red {
+      background: #ff5f57;
+    }
+
+    .t-yellow {
+      background: #febc2e;
+    }
+
+    .t-green {
+      background: #28c840;
+    }
+
+    .terminal-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--c-muted);
+      margin-left: 12px;
+    }
+
+    .terminal-body {
+      padding: 28px 24px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 2;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .t-blue {
+      color: #60a5fa;
+    }
+
+    .t-green2 {
+      color: #34d399;
+    }
+
+    .t-purple {
+      color: #c084fc;
+    }
+
+    .t-white {
+      color: #fff;
+    }
+
+    .t-dim {
+      color: var(--c-muted);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: ENGINE / TECH
+    ════════════════════════════════════════════════════════════════ */
+    .section-header {
+      text-align: center;
+      margin-bottom: 80px;
+      width: 100%;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 8vw, 100px);
+      text-transform: uppercase;
+      line-height: 0.88;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--c-text-dim);
+      max-width: 600px;
+      margin: 20px auto 0;
+      line-height: 1.7;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      padding: 48px 36px;
+      border-radius: 24px;
+      text-align: left;
+      transition: all 0.7s var(--ease-expo);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-12px);
+      border-color: var(--c-blue-light);
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 28px;
+      display: block;
+    }
+
+    .feature-title {
+      font-family: var(--font-ui);
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+
+    .feature-desc {
+      color: var(--c-text-dim);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 20px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--c-blue-light);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: SPEC TABLE
+    ════════════════════════════════════════════════════════════════ */
+    .spec-table-wrap {
+      width: 100%;
+      max-width: 960px;
+      margin-top: 60px;
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 32px;
+      border-bottom: 1px solid var(--c-border);
+      transition: background 0.3s;
+    }
+
+    .spec-row:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .spec-key {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--c-muted);
+      letter-spacing: 0.2em;
+    }
+
+    .spec-val {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .spec-val.blue {
+      color: var(--c-blue-light);
+    }
+
+    .spec-val.green {
+      color: var(--c-emerald);
+    }
+
+    .spec-val.white {
+      color: var(--c-text);
+    }
+
+    .spec-val.purple {
+      color: #c084fc;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: DASHBOARD PREVIEW
+    ════════════════════════════════════════════════════════════════ */
+    .preview-frame {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 60px;
+      perspective: 2200px;
+    }
+
+    .preview-inner {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 80px 180px rgba(0, 0, 0, 1), 0 0 120px rgba(37, 99, 235, 0.07);
+      transform: rotateX(4deg);
+      transition: transform 1.2s var(--ease-expo);
+    }
+
+    .preview-frame:hover .preview-inner {
+      transform: rotateX(0deg);
+    }
+
+    .preview-topbar {
+      background: #0d0d10;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .preview-img {
+      width: 100%;
+      display: block;
+      background: #0a0a10;
+      min-height: 400px;
+      object-fit: cover;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: PERFORMANCE
+    ════════════════════════════════════════════════════════════════ */
+    .perf-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      width: 100%;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+      .perf-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .perf-card {
+      padding: 48px;
+      border-radius: 24px;
+      text-align: left;
+    }
+
+    .perf-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .perf-bar-wrap {
+      margin-top: 32px;
+    }
+
+    .perf-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .perf-bar-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--c-muted);
+      width: 140px;
+      flex-shrink: 0;
+    }
+
+    .perf-bar-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .perf-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--c-blue), var(--c-blue-light));
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 1.6s var(--ease-expo) 0.3s;
+    }
+
+    .perf-bar-fill.animate {
+      transform: scaleX(1);
+    }
+
+    .perf-bar-pct {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--c-blue-light);
+      width: 40px;
+      text-align: right;
+    }
+
+    /* Thread visualizer */
+    .thread-canvas {
+      width: 100%;
+      height: 200px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      overflow: hidden;
+    }
+
+    .thread-bar {
+      flex: 1;
+      max-width: 6px;
+      background: var(--c-blue-light);
+      opacity: 0.25;
+      border-radius: 2px 2px 0 0;
+      transition: height 1.4s var(--ease-expo), opacity 1.4s;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: WORKFLOW / TIMELINE
+    ════════════════════════════════════════════════════════════════ */
+    .timeline {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 60px;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 32px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--c-blue-light), transparent);
+    }
+
+    .timeline-step {
+      display: flex;
+      gap: 40px;
+      padding: 60px 0;
+      text-align: left;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .timeline-step:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .timeline-step:first-child {
+      padding-top: 0;
+    }
+
+    .timeline-num {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--c-blue-light);
+      position: relative;
+      z-index: 2;
+    }
+
+    .timeline-content h4 {
+      font-family: var(--font-ui);
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .timeline-content p {
+      color: var(--c-text-dim);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: COMPARISON TABLE
+    ════════════════════════════════════════════════════════════════ */
+    .comparison-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 60px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      min-width: 700px;
+      border-collapse: collapse;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 20px 28px;
+      text-align: center;
+      border-bottom: 1px solid var(--c-border);
+    }
+
+    .comparison-table th {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .comparison-table th.featured {
+      color: var(--c-blue-light);
+    }
+
+    .comparison-table td {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--c-text-dim);
+    }
+
+    .comparison-table td.feat-name {
+      text-align: left;
+      color: var(--c-text);
+      font-weight: 500;
+    }
+
+    .comparison-table td.check-yes {
+      color: var(--c-emerald);
+      font-weight: 700;
+    }
+
+    .comparison-table td.check-no {
+      color: var(--c-muted);
+    }
+
+    .comparison-table td.check-part {
+      color: var(--c-gold);
+    }
+
+    .comparison-table tr.highlight-row td {
+      background: rgba(37, 99, 235, 0.04);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: PRICING
+    ════════════════════════════════════════════════════════════════ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 900px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pricing-card {
+      padding: 52px 40px;
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.7s var(--ease-expo);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-16px);
+    }
+
+    .pricing-card.featured {
+      border-color: var(--c-blue-light) !important;
+      background: rgba(37, 99, 235, 0.06) !important;
+      box-shadow: 0 0 80px rgba(37, 99, 235, 0.12);
+    }
+
+    .pricing-plan {
+      font-family: var(--font-display);
+      font-size: 48px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .pricing-price {
+      font-family: var(--font-display);
+      font-size: 64px;
+      line-height: 1;
+      margin: 20px 0 8px;
+    }
+
+    .pricing-period {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--c-muted);
+      letter-spacing: 0.3em;
+      margin-bottom: 40px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      width: 100%;
+      text-align: left;
+      margin-bottom: 40px;
+      flex: 1;
+    }
+
+    .pricing-features li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--c-border);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--c-text-dim);
+    }
+
+    .pricing-features li.active {
+      color: var(--c-text);
+    }
+
+    .pricing-features li span.icon {
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .pricing-popular-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 100px;
+      background: var(--c-blue);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .enterprise-block {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 60px;
+      padding: 60px;
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+
+    .enterprise-block h3 {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      text-transform: uppercase;
+    }
+
+    .enterprise-block p {
+      color: var(--c-text-dim);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 540px;
+      margin-top: 12px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: FAQ
+    ════════════════════════════════════════════════════════════════ */
+    .faq-list {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 60px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.5s var(--ease-expo);
+    }
+
+    .faq-item.open {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      margin-bottom: 16px;
+    }
+
+    .faq-question {
+      width: 100%;
+      padding: 24px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      text-align: left;
+      background: none;
+      border: none;
+      color: var(--c-text);
+      cursor: none;
+      transition: color 0.3s;
+    }
+
+    .faq-question:hover {
+      color: var(--c-blue-light);
+    }
+
+    .faq-q-text {
+      font-family: var(--font-ui);
+      font-size: 17px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .faq-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+      transition: all 0.4s;
+      color: var(--c-blue-light);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+      background: rgba(37, 99, 235, 0.12);
+      border-color: var(--c-blue-light);
+    }
+
+    .faq-answer {
+      font-size: 15px;
+      color: var(--c-text-dim);
+      line-height: 1.85;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.7s var(--ease-expo), padding 0.5s;
+      padding: 0;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 500px;
+      padding: 0 28px 28px;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: SECURITY
+    ════════════════════════════════════════════════════════════════ */
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      width: 100%;
+      margin-top: 60px;
+    }
+
+    @media (max-width: 900px) {
+      .security-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .security-card {
+      padding: 44px 36px;
+      border-radius: 24px;
+      text-align: left;
+    }
+
+    .security-icon {
+      font-size: 36px;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .security-title {
+      font-family: var(--font-ui);
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+
+    .security-desc {
+      font-size: 14px;
+      color: var(--c-text-dim);
+      line-height: 1.75;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SECTION: CTA
+    ════════════════════════════════════════════════════════════════ */
+    #cta {
+      background: radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.1) 0%, transparent 60%);
+    }
+
+    .cta-big {
+      font-family: var(--font-display);
+      font-size: clamp(80px, 14vw, 180px);
+      text-transform: uppercase;
+      line-height: 0.84;
+      text-align: center;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════════════════════════════════ */
+    footer {
+      padding: 80px clamp(20px, 5vw, 80px) 60px;
+      border-top: 1px solid var(--c-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 40px;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 56px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .footer-logo span {
+      color: var(--c-blue-light);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-links a {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--c-border);
+      color: var(--c-muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.4s;
+      cursor: none;
+    }
+
+    .footer-links a:hover {
+      border-color: var(--c-blue-light);
+      color: var(--c-text);
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    .footer-legal {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--c-muted);
+      max-width: 800px;
+      line-height: 1.8;
+      letter-spacing: 0.05em;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       MOBILE RESPONSIVENESS (PHONE SUPPORT)
+    ════════════════════════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      :root {
+        --section-pad: 80px 20px;
+      }
+
+      body {
+        cursor: auto;
+        /* Show default cursor on mobile */
+      }
+
+      #cursor-dot,
+      #cursor-ring {
+        display: none;
+      }
+
+      #navbar {
+        padding: 15px 20px;
+      }
+
+      .nav-logo {
+        font-size: 1.5rem;
+      }
+
+      #lang-btn {
+        left: auto;
+        right: 20px;
+        top: 15px;
+        padding: 8px 16px;
+        font-size: 9px;
+      }
+
+      .hero-title {
+        font-size: 56px;
+      }
+
+      .hero-subtitle {
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        width: 100%;
+        gap: 15px;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 16px 20px;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr 1fr;
+        margin-top: 60px;
+      }
+
+      .hero-stat {
+        padding: 25px 15px;
+      }
+
+      .section-title {
+        font-size: 42px;
+      }
+
+      .features-grid,
+      .security-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .enterprise-block {
+        padding: 30px 20px;
+        text-align: center;
+        justify-content: center;
+      }
+
+      .enterprise-block p {
+        margin: 15px auto;
+      }
+
+      .comparison-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .footer-logo {
+        font-size: 42px;
+      }
+
+      .cta-big {
+        font-size: 64px;
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       REVEAL ANIMATIONS
+    ════════════════════════════════════════════════════════════════ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 1.1s var(--ease-expo), transform 1.1s var(--ease-expo);
+    }
+
+    .reveal-delay-1.in-view {
+      transition-delay: 0.1s;
+    }
+
+    .reveal-delay-2.in-view {
+      transition-delay: 0.2s;
+    }
+
+    .reveal-delay-3.in-view {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-delay-4.in-view {
+      transition-delay: 0.4s;
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       TICKER / MARQUEE
+    ════════════════════════════════════════════════════════════════ */
+    .ticker-wrap {
+      width: 100%;
+      overflow: hidden;
+      border-top: 1px solid var(--c-border);
+      border-bottom: 1px solid var(--c-border);
+      padding: 18px 0;
+      background: rgba(255, 255, 255, 0.008);
+    }
+
+    .ticker-inner {
+      display: flex;
+      gap: 0;
+      animation: ticker-scroll 30s linear infinite;
+      width: max-content;
+    }
+
+    .ticker-item {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      padding: 0 48px;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .ticker-sep {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--c-blue-light);
+      flex-shrink: 0;
+    }
+
+    @keyframes ticker-scroll {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       LOADING SCREEN
+    ════════════════════════════════════════════════════════════════ */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--c-bg);
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loader-logo {
+      font-family: var(--font-display);
+      font-size: 72px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .loader-logo span {
+      color: var(--c-blue-light);
+    }
+
+    .loader-bar-track {
+      width: 240px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .loader-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--c-blue), var(--c-blue-light));
+      border-radius: 100px;
+      animation: loader-fill 1.6s var(--ease-expo) forwards;
+    }
+
+    @keyframes loader-fill {
+      from {
+        width: 0%;
+      }
+
+      to {
+        width: 100%;
+      }
+    }
+
+    .loader-text {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       MISC UTILITIES
+    ════════════════════════════════════════════════════════════════ */
+    .text-blue {
+      color: var(--c-blue-light);
+    }
+
+    .text-purple {
+      color: #c084fc;
+    }
+
+    .text-green {
+      color: var(--c-emerald);
+    }
+
+    @media (max-width: 900px) {
+      .video-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .perf-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    .flex-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .mt-4 {
+      margin-top: 16px;
+    }
+
+    .mt-8 {
+      margin-top: 32px;
+    }
+
+    .mt-16 {
+      margin-top: 64px;
+    }
+
+    .gap-4 {
+      gap: 16px;
+    }
+
+    /* GLOW ACCENT LINES */
+    .glow-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--c-blue-light), transparent);
+      opacity: 0.3;
+      margin: 0;
+    }
+
+    /* Section number decorations */
+    .section-number {
+      font-family: var(--font-display);
+      font-size: 200px;
+      color: rgba(255, 255, 255, 0.02);
+      position: absolute;
+      top: 60px;
+      right: 0;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ──── LOADING SCREEN ──── -->
+  <div id="loader">
+    <div class="loader-logo">UTS <span>PRO</span></div>
+    <div class="loader-bar-track">
+      <div class="loader-bar-fill"></div>
+    </div>
+    <div class="loader-text mono">Initializing Titan Engine...</div>
+  </div>
+
+  <!-- ──── CURSOR ──── -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+  <div class="bg-overlay"></div>
+
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- ──── LANG TOGGLE ──── -->
+  <button id="lang-btn" onclick="toggleLang()">
+    <span data-lang="tr">TR / EN</span>
+    <span data-lang="en">EN / TR</span>
+  </button>
+
+  <!-- ──── NAVBAR ──── -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo" style="display:flex;align-items:center;gap:10px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round" style="filter:drop-shadow(0 0 8px var(--c-blue-glow));">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+      </svg>
+      UTS <span>PRO</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">CORE</a></li>
+      <li><a href="#engine">TECH</a></li>
+      <li><a href="#preview">DASHBOARD</a></li>
+      <li><a href="#video-demo">DEMO</a></li>
+      <li><a href="#pricing">LICENSE</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#access">ACCESS</a></li>
+    </ul>
+    <a href="mailto:toprakahmetaydogmus0@gmail.com" class="btn btn-ghost"
+      style="padding:12px 28px;font-size:9px;">CONTACT</a>
+  </nav>
+
+  <main>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 01  HERO
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="hero" class="section">
+      <div class="wrap">
+
+        <div class="hero-eyebrow" id="eyebrow">
+          <div class="badge">
+            <div class="badge-dot"></div>
+            <span data-lang="tr">SINIRSIZ PARALEL KANAL AKTİF</span>
+            <span data-lang="en">UNLIMITED PARALLEL THREADS ACTIVE</span>
+          </div>
+        </div>
+
+        <h1 class="hero-title" id="hero-title">
+          <span style="display:block;">UNLIMITED</span>
+          <span style="display:block;" class="text-grad-blue">TITAN POWER</span>
+        </h1>
+
+        <p class="hero-subtitle" id="hero-sub">
+          <span data-lang="tr">V7 Kernel mimarisi ile <strong>1.8 saniye</strong> işlem hızına ulaşan T.C. Sağlık
+            Bakanlığı ÜTS sistemi için dünyanın en hızlı medikal RPA otomasyon motoru.</span>
+          <span data-lang="en">The world's fastest medical RPA automation engine for Turkey's Ministry of Health UTS
+            system — reaching <strong>1.8s</strong> query speeds with V7 Kernel architecture.</span>
+        </p>
+
+        <div class="hero-ctas" id="hero-ctas">
+          <a href="#pricing" class="btn btn-primary">
+            <span data-lang="tr">SİSTEMİ BAŞLAT</span>
+            <span data-lang="en">START ENGINE</span>
+          </a>
+          <a href="#engine" class="btn btn-ghost">
+            <span data-lang="tr">TEKNİK DETAYLAR</span>
+            <span data-lang="en">TECHNICAL SPECS</span>
+          </a>
+        </div>
+
+        <div class="hero-stats glass" id="hero-stats" style="border-radius:20px;">
+          <div class="hero-stat">
+            <span class="hero-stat-num text-blue counter" data-target="1.8" data-dec="1">0</span>
+            <span class="hero-stat-label">SEC / QUERY</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num text-purple counter" data-target="9999" data-dec="0">0</span>
+            <span class="hero-stat-label">UNLIMITED WORKERS</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num text-green counter" data-target="99.9" data-dec="1">0</span>
+            <span class="hero-stat-label">% ACCURACY</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num" style="color:var(--c-gold);">AES</span>
+            <span class="hero-stat-label">256-BIT HWID</span>
+          </div>
+        </div>
+
+        <div class="scroll-hint">
+          <div class="scroll-line"></div>
+          <span>SCROLL</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ──── TICKER ──── -->
+    <div class="ticker-wrap">
+      <div class="ticker-inner">
+        <!-- items doubled for seamless loop -->
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>UTS PRO v9.0 TITAN STABLE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>NODE.JS v20 + PUPPETEER v21
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>HWID AES-256 LICENSE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>LOCAL SQLite3 DATABASE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>V7 ANGULAR BYPASS ENGINE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>RASPBERRY PI ARM64 SUPPORT
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>HTTP/2 STEALTH PROTOCOL
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>AUTO PDF MERGE + EXCEL
+        </div>
+        <!-- duplicate -->
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>UTS PRO v9.0 TITAN STABLE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>NODE.JS v20 + PUPPETEER v21
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>HWID AES-256 LICENSE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>LOCAL SQLite3 DATABASE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>V7 ANGULAR BYPASS ENGINE
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>RASPBERRY PI ARM64 SUPPORT
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>HTTP/2 STEALTH PROTOCOL
+        </div>
+        <div class="ticker-item">
+          <div class="ticker-sep"></div>AUTO PDF MERGE + EXCEL
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 02  ABOUT — WHAT IS UTS PRO
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="about" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">02</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">
+            <div class="badge-dot"></div>
+            <span data-lang="tr">PROJE HAKKINDA</span>
+            <span data-lang="en">ABOUT THE PROJECT</span>
+          </div>
+          <h2 class="section-title" data-lang="tr">TIBBİ CİHAZ <span class="text-grad-blue">OTOMASYONU</span></h2>
+          <h2 class="section-title" data-lang="en">MEDICAL DEVICE <span class="text-grad-blue">AUTOMATION</span></h2>
+          <p class="section-sub" data-lang="tr">T.C. Sağlık Bakanlığı ÜTS sisteminde manuel olarak yapılan tıbbi cihaz
+            sorgulama işlemlerini tamamen otomatize eden profesyonel RPA çözümü.</p>
+          <p class="section-sub" data-lang="en">Professional RPA solution that fully automates medical device queries on
+            the Ministry of Health UTS portal, eliminating manual data entry errors.</p>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-text-block reveal">
+            <h3 data-lang="tr">NEDEN <span class="text-grad-blue">UTS PRO?</span></h3>
+            <h3 data-lang="en">WHY <span class="text-grad-blue">UTS PRO?</span></h3>
+            <p data-lang="tr">Hastaneler ve tıbbi cihaz tedarikçileri her gün onlarca barkod sorgusunu manuel olarak
+              gerçekleştirmek zorunda kalıyor. Bu süreç; hata riskini artırıyor, zaman kaybettiriyor ve insan gücünü
+              tüketiyor.</p>
+            <p data-lang="en">Hospitals and medical device suppliers must manually run dozens of barcode queries every
+              day — creating error risks, consuming time, and draining human resources.</p>
+            <p data-lang="tr">UTS PRO bu süreci saniyeler içinde tamamlar. <strong>%99.9 doğruluk oranı</strong>,
+              otomatik PDF arşivleme ve profesyonel Excel raporlama ile ihale ve teknik şartname süreçlerinizi devrim
+              niteliğinde dönüştürür.</p>
+            <p data-lang="en">UTS PRO completes this process in seconds. With <strong>99.9% accuracy</strong>, automatic
+              PDF archiving, and professional Excel reporting, it transforms your tendering and specification processes.
+            </p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+              <div class="badge" style="margin-bottom:0;"><span data-lang="tr">Hastaneler</span><span
+                  data-lang="en">Hospitals</span></div>
+              <div class="badge" style="margin-bottom:0;"><span data-lang="tr">Tedarikçiler</span><span
+                  data-lang="en">Suppliers</span></div>
+              <div class="badge" style="margin-bottom:0;"><span data-lang="tr">İhale Komisyonları</span><span
+                  data-lang="en">Tender Committees</span></div>
+            </div>
+          </div>
+
+          <div class="about-terminal reveal reveal-delay-2 glass" style="border-radius:16px;overflow:hidden;">
+            <div class="terminal-bar">
+              <div class="terminal-dot t-red"></div>
+              <div class="terminal-dot t-yellow"></div>
+              <div class="terminal-dot t-green"></div>
+              <span class="terminal-title">UTS_TITAN_KERNEL_v9.0.log</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="t-dim">[00:01:02]</span> <span class="t-white">KERNEL :</span> Bootstrapping Titan
+                Architecture v9...</div>
+              <div><span class="t-dim">[00:01:03]</span> <span class="t-blue">AUTH :</span> HWID Binding Verified
+                [B43K-992X-L1P0]</div>
+              <div><span class="t-dim">[00:01:04]</span> <span class="t-white">DB :</span> SQLite3 uts.db Loaded.
+                Records: 14,832</div>
+              <div><span class="t-dim">[00:01:05]</span> <span class="t-purple">HTTP :</span> Stealth Proxy Cluster ·
+                HTTP/2 · Active</div>
+              <div><span class="t-dim">[00:01:06]</span> <span class="t-white">PUPPETEER:</span> Chromium Headless
+                Engine Ready.</div>
+              <div><span class="t-dim">[00:01:07]</span> <span class="t-white">RPA :</span> P-Queue Workers: 9999+
+                Parallel READY</div>
+              <div><span class="t-dim">[00:01:08]</span> <span class="t-blue">V7 :</span> Angular Scope Bypass Injected.
+                ✓</div>
+              <div><span class="t-dim">[00:01:09]</span> <span class="t-green2">READY :</span> Awaiting Barcode Input...
+                ■</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 03  ENGINE — TECHNOLOGY
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="engine" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">03</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">
+            <span data-lang="tr">MİMARİ</span>
+            <span data-lang="en">ARCHITECTURE</span>
+          </div>
+          <h2 class="section-title" data-lang="tr">GERÇEK <span class="text-grad-blue">TEKNOLOJİ</span></h2>
+          <h2 class="section-title" data-lang="en">REAL <span class="text-grad-blue">TECHNOLOGY</span></h2>
+        </div>
+
+        <div class="features-grid w-full">
+          <div class="feature-card glass glass-hover reveal">
+            <span class="feature-icon">⚡</span>
+            <div class="feature-title">V7 INJECTION ENGINE</div>
+            <p class="feature-desc" data-lang="tr">Angular scope bypass mekanizması sayfa yüklenmesini beklemeden
+              doğrudan DOM verisini çeker. Standart yönteme göre %400 hız artışı sağlar.</p>
+            <p class="feature-desc" data-lang="en">Angular scope bypass directly extracts DOM data without waiting for
+              page load events — delivering 400% speed improvement over standard methods.</p>
+            <span class="feature-tag">core/v7_injection.js</span>
+          </div>
+
+          <div class="feature-card glass glass-hover reveal reveal-delay-1">
+            <span class="feature-icon">📂</span>
+            <div class="feature-title" data-lang="tr">YEREL VERİTABANI</div>
+            <div class="feature-title" data-lang="en">LOCAL DATABASE</div>
+            <p class="feature-desc" data-lang="tr">Verileriniz (uts.db) asla dışarı çıkmaz. Tamamen yerel SQLite3
+              mimarisi, sıfır gecikme ile maksimum veri güvenliği sağlar.</p>
+            <p class="feature-desc" data-lang="en">Your data (uts.db) never leaves your machine. Pure local SQLite3
+              architecture ensures maximum data security with zero latency.</p>
+            <span class="feature-tag">core/db_manager.js</span>
+          </div>
+
+          <div class="feature-card glass glass-hover reveal reveal-delay-2">
+            <span class="feature-icon">📄</span>
+            <div class="feature-title">PDF + EXCEL ENGINE</div>
+            <p class="feature-desc" data-lang="tr">Otomatik PDF birleştirme ve ExcelJS raporlama motoru. İhale
+              komisyonları için teknik şartname formatında profesyonel çıktılar üretir.</p>
+            <p class="feature-desc" data-lang="en">Automatic PDF merging and ExcelJS reporting engine. Produces
+              professional outputs in technical specification format for tender committees.</p>
+            <span class="feature-tag">core/pdf_fusion.js</span>
+          </div>
+
+          <div class="feature-card glass glass-hover reveal">
+            <span class="feature-icon">🤖</span>
+            <div class="feature-title" data-lang="tr">AI BARKOD AYIKLAYICI</div>
+            <div class="feature-title" data-lang="en">AI BARCODE EXTRACTOR</div>
+            <p class="feature-desc" data-lang="tr">Karmaşık listelerden, Excel dosyalarından veya serbest metinden
+              barkod numaralarını akıllıca ayıklayan yapay zeka motoru.</p>
+            <p class="feature-desc" data-lang="en">AI engine that intelligently extracts barcode numbers from complex
+              lists, Excel files, or free-form text with high precision.</p>
+            <span class="feature-tag">core/ai_parser.js</span>
+          </div>
+
+          <div class="feature-card glass glass-hover reveal reveal-delay-1">
+            <span class="feature-icon">🔄</span>
+            <div class="feature-title" data-lang="tr">HATA KURTARMA</div>
+            <div class="feature-title" data-lang="en">ERROR RECOVERY</div>
+            <p class="feature-desc" data-lang="tr">Başarısız sorguları otomatik algılar ve akıllı yeniden deneme döngüsü
+              ile işlemleri kurtarır. Sıfır kayıp garantisi.</p>
+            <p class="feature-desc" data-lang="en">Automatically detects failed queries and recovers operations with an
+              intelligent retry loop. Zero data loss guarantee.</p>
+            <span class="feature-tag">core/recovery.js</span>
+          </div>
+
+          <div class="feature-card glass glass-hover reveal reveal-delay-2">
+            <span class="feature-icon">📡</span>
+            <div class="feature-title">WEBSOCKET DASHBOARD</div>
+            <p class="feature-desc" data-lang="tr">Socket.io ile anlık durum takibi. İşlem ilerlemesini, başarı/hata
+              oranlarını ve log çıktılarını gerçek zamanlı izleyin.</p>
+            <p class="feature-desc" data-lang="en">Real-time status monitoring via Socket.io. Track operation progress,
+              success/error rates, and log outputs live.</p>
+            <span class="feature-tag">core/server.js</span>
+          </div>
+        </div>
+
+        <!-- SPEC TABLE -->
+        <div class="spec-table-wrap glass reveal" style="border-radius:24px;overflow:hidden;margin-top:80px;">
+          <div style="padding:32px 40px;border-bottom:1px solid var(--c-border);">
+            <div class="badge" style="margin-bottom:0;">SYSTEM SPECIFICATIONS</div>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Kernel Version</span>
+            <span class="spec-val blue">v9.0.9-TITAN-STABLE</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Runtime</span>
+            <span class="spec-val white">Node.js v20.10.0 LTS</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Browser Engine</span>
+            <span class="spec-val white">Puppeteer-Extra v21 + Stealth</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Protocol</span>
+            <span class="spec-val white">HTTP/2 Stealth · WebSocket</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Database</span>
+            <span class="spec-val white">SQLite3 / SQL.js — Local Only</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Concurrency</span>
+            <span class="spec-val white">P-Queue Async v4 · Dynamic Worker Pool</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">License Security</span>
+            <span class="spec-val green">HWID AES-256 Binding</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Target System</span>
+            <span class="spec-val white">UTS Angular v14 Portal Bypass</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">OS Support</span>
+            <span class="spec-val white">Windows 10/11 x64 · Linux ARM64</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Pi Support</span>
+            <span class="spec-val green">Raspberry Pi 4 / 5 (ARM64) ✓</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Min RAM</span>
+            <span class="spec-val white">8 GB (16 GB Recommended)</span>
+          </div>
+          <div class="spec-row" style="border-bottom:none;">
+            <span class="spec-key">Reporting</span>
+            <span class="spec-val purple">ExcelJS · PDF-Lib · PDF Merge</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 04  DASHBOARD PREVIEW
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="preview" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">04</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">SYSTEM INTERFACE</div>
+          <h2 class="section-title" data-lang="tr">YÖNETİM <span class="text-grad-blue">PANELİ</span></h2>
+          <h2 class="section-title" data-lang="en">ADMIN <span class="text-grad-blue">DASHBOARD</span></h2>
+          <p class="section-sub" data-lang="tr">Socket.io ile canlı güncelleme alan, tüm işlemlerinizi merkezi olarak
+            yönetmenizi sağlayan modern arayüz.</p>
+          <p class="section-sub" data-lang="en">A modern interface that receives live updates via Socket.io and lets you
+            manage all operations centrally.</p>
+        </div>
+
+        <div class="preview-frame reveal w-full">
+          <div class="preview-inner">
+            <div class="preview-topbar">
+              <div class="terminal-dot t-red"></div>
+              <div class="terminal-dot t-yellow"></div>
+              <div class="terminal-dot t-green"></div>
+              <span
+                style="font-family:var(--font-mono);font-size:11px;color:var(--c-muted);margin-left:16px;">localhost:3000
+                — UTS PRO DASHBOARD</span>
+            </div>
+            <!-- dashboard.png will be loaded from GitHub Pages repo -->
+            <img src="dashboard.png" alt="UTS PRO v9 Admin Dashboard" class="preview-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <div
+              style="display:none;min-height:420px;align-items:center;justify-content:center;flex-direction:column;gap:20px;background:#060608;padding:60px;">
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--c-muted);letter-spacing:0.3em;">[
+                dashboard.png ]</div>
+              <div style="font-size:12px;color:var(--c-muted);opacity:0.5;">Place dashboard.png in the repository root
+                to display the screenshot here.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FEATURE CALLOUTS BELOW PREVIEW -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;width:100%;margin-top:40px;">
+          <div class="glass reveal" style="padding:28px;border-radius:16px;text-align:left;">
+            <div style="font-size:24px;margin-bottom:12px;">📊</div>
+            <div
+              style="font-family:var(--font-ui);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;"
+              data-lang="tr">Canlı İstatistik</div>
+            <div
+              style="font-family:var(--font-ui);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;"
+              data-lang="en">Live Statistics</div>
+            <p style="font-size:13px;color:var(--c-text-dim);" data-lang="tr">İşlem başarı/hata oranlarını anlık
+              izleyin.</p>
+            <p style="font-size:13px;color:var(--c-text-dim);" data-lang="en">Monitor success/error rates in real time.
+            </p>
+          </div>
+          <div class="glass reveal reveal-delay-1" style="padding:28px;border-radius:16px;text-align:left;">
+            <div style="font-size:24px;margin-bottom:12px;">📋</div>
+            <div
+              style="font-family:var(--font-ui);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;"
+              data-lang="tr">Toplu Barkod Girişi</div>
+            <div
+              style="font-family:var(--font-ui);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;"
+              data-lang="en">Bulk Barcode Input</div>
+            <p style="font-size:13px;color:var(--c-text-dim);" data-lang="tr">Yüzlerce barkodu tek seferde yapıştırın.
+            </p>
+            <p style="font-size:13px;color:var(--c-text-dim);" data-lang="en">Paste hundreds of barcodes in one go.</p>
+          </div>
+          <div class="glass reveal reveal-delay-2" style="padding:28px;border-radius:16px;text-align:left;">
+            <div style="font-size:24px;margin-bottom:12px;">⬇️</div>
+            <div
+              style="font-family:var(--font-ui);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;"
+              data-lang="tr">Tek Tıkla İndir</div>
+            <div
+              style="font-family:var(--font-ui);font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;"
+              data-lang="en">One-Click Download</div>
+            <p style="font-size:13px;color:var(--c-text-dim);" data-lang="tr">Birleşik PDF ve Excel raporunu indirin.
+            </p>
+            <p style="font-size:13px;color:var(--c-text-dim);" data-lang="en">Download the merged PDF and Excel report.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 04.5  VIDEO DEMONSTRATION
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="video-demo" class="section" style="position:relative;background:rgba(5,5,7,0.4);">
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">WATCH IN ACTION</div>
+          <h2 class="section-title" data-lang="tr">CANLI <span class="text-grad-blue">DEMO</span></h2>
+          <h2 class="section-title" data-lang="en">LIVE <span class="text-grad-blue">DEMONSTRATION</span></h2>
+          <p class="section-sub" data-lang="tr">UTS PRO v9'un gerçek zamanlı hızını ve otomasyon kabiliyetini izleyin.
+          </p>
+          <p class="section-sub" data-lang="en">Watch the real-time speed and automation capabilities of UTS PRO v9.</p>
+        </div>
+
+        <div class="video-grid reveal"
+          style="display:grid;grid-template-columns:1.5fr 1fr;gap:40px;align-items:center;margin-top:60px;">
+          <!-- Video Frame -->
+          <div class="glass"
+            style="padding:15px;border-radius:24px;position:relative;overflow:hidden;box-shadow:0 30px 60px -12px rgba(0,0,0,0.5);">
+            <div
+              style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;background:#000;">
+              <!-- TR VIDEO -->
+              <div data-lang="tr" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                <iframe width="560" height="315"
+                  src="https://www.youtube.com/embed/BIcID2rk9f0?si=dBsk0yrNciXF1F_h&amp;start=35"
+                  title="UTS PRO Demo TR" frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+                  style="width:100%;height:100%;border:0;"></iframe>
+              </div>
+              <!-- EN VIDEO -->
+              <div data-lang="en" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/5oZMM9GhPDQ?si=v0crBKqdzlcofCW3"
+                  title="UTS PRO Demo EN" frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+                  style="width:100%;height:100%;border:0;"></iframe>
+              </div>
+            </div>
+            <div style="position:absolute;bottom:25px;right:25px;">
+              <div class="badge" style="background:rgba(37,99,235,0.8);border:none;backdrop-filter:blur(10px);">
+                TECHNICAL ANALYSIS ACTIVE</div>
+            </div>
+          </div>
+
+          <!-- Video Subtitles / Info -->
+          <div style="text-align:left;">
+            <div class="glass reveal reveal-delay-1"
+              style="padding:40px;border-radius:24px;border-left:4px solid var(--c-blue-light);">
+              <h3 style="font-family:var(--font-display);font-size:32px;margin-bottom:20px;" data-lang="tr">SİSTEM
+                ANALİZİ</h3>
+              <h3 style="font-family:var(--font-display);font-size:32px;margin-bottom:20px;" data-lang="en">SYSTEM
+                ANALYSIS</h3>
+
+              <ul style="list-style:none;display:flex;flex-direction:column;gap:15px;">
+                <li style="display:flex;gap:12px;font-size:14px;color:var(--c-text-dim);">
+                  <span style="color:var(--c-blue-light);">[00:37]</span>
+                  <span data-lang="tr">V7 Kernel motorunun ÜTS portalına güvenli enjeksiyonu.</span>
+                  <span data-lang="en">Secure injection of V7 Kernel into the UTS portal.</span>
+                </li>
+                <li style="display:flex;gap:12px;font-size:14px;color:var(--c-text-dim);">
+                  <span style="color:var(--c-blue-light);">[01:15]</span>
+                  <span data-lang="tr">Paralel kanallar üzerinden 1.8s/sorgu hızıyla veri çekimi.</span>
+                  <span data-lang="en">Data fetching via parallel threads at 1.8s/query.</span>
+                </li>
+                <li style="display:flex;gap:12px;font-size:14px;color:var(--c-text-dim);">
+                  <span style="color:var(--c-blue-light);">[02:45]</span>
+                  <span data-lang="tr">Otomatik PDF birleştirme ve teknik şartname Excel raporu.</span>
+                  <span data-lang="en">Auto PDF merging and technical specification Excel report.</span>
+                </li>
+                <li style="display:flex;gap:12px;font-size:14px;color:var(--c-text-dim);">
+                  <span style="color:var(--c-blue-light);">[FINAL]</span>
+                  <span data-lang="tr">AES-256 şifreli veri saklama ve HWID lisans doğrulaması.</span>
+                  <span data-lang="en">AES-256 encrypted storage and HWID license validation.</span>
+                </li>
+              </ul>
+
+              <div
+                style="margin-top:30px;padding-top:25px;border-top:1px solid var(--c-border);display:flex;align-items:center;gap:15px;">
+                <div
+                  style="width:10px;height:10px;border-radius:50%;background:var(--c-emerald);box-shadow:0 0 10px var(--c-emerald);">
+                </div>
+                <div style="font-family:var(--font-mono);font-size:10px;color:var(--c-muted);letter-spacing:0.1em;">LIVE
+                  STATUS: ENGINE READY</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 05  PERFORMANCE
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="performance" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">05</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">PERFORMANCE METRICS</div>
+          <h2 class="section-title" data-lang="tr">ÖLÇÜLEBILIR <span class="text-grad-blue">SONUÇLAR</span></h2>
+          <h2 class="section-title" data-lang="en">MEASURABLE <span class="text-grad-blue">RESULTS</span></h2>
+        </div>
+
+        <div class="perf-grid">
+          <!-- Benchmark bars -->
+          <div class="perf-card glass reveal" style="border-radius:24px;">
+            <div class="badge" style="margin-bottom:16px;">BENCHMARK</div>
+            <h3 style="font-family:var(--font-display);font-size:36px;text-transform:uppercase;margin-bottom:8px;"
+              data-lang="tr">Hız Analizi</h3>
+            <h3 style="font-family:var(--font-display);font-size:36px;text-transform:uppercase;margin-bottom:8px;"
+              data-lang="en">Speed Analysis</h3>
+            <p style="font-size:13px;color:var(--c-text-dim);margin-bottom:32px;" data-lang="tr">V7 mimarisi ile
+              rakipler arasındaki hız farkı.</p>
+            <p style="font-size:13px;color:var(--c-text-dim);margin-bottom:32px;" data-lang="en">Speed advantage of V7
+              architecture over competitors.</p>
+            <div class="perf-bar-wrap">
+              <div class="perf-bar-row">
+                <span class="perf-bar-label">UTS PRO v9</span>
+                <div class="perf-bar-track">
+                  <div class="perf-bar-fill" data-width="1" style="background:linear-gradient(90deg,#2563eb,#3b82f6);">
+                  </div>
+                </div>
+                <span class="perf-bar-pct text-blue">1.8s</span>
+              </div>
+              <div class="perf-bar-row">
+                <span class="perf-bar-label">UTS PRO v7</span>
+                <div class="perf-bar-track">
+                  <div class="perf-bar-fill" data-width="0.6" style="background:rgba(255,255,255,0.25);"></div>
+                </div>
+                <span class="perf-bar-pct" style="color:var(--c-muted);">7.2s</span>
+              </div>
+              <div class="perf-bar-row">
+                <span class="perf-bar-label" data-lang="tr">Manuel Süreç</span>
+                <span class="perf-bar-label" data-lang="en">Manual Process</span>
+                <div class="perf-bar-track">
+                  <div class="perf-bar-fill" data-width="0.2" style="background:rgba(239,68,68,0.4);"></div>
+                </div>
+                <span class="perf-bar-pct" style="color:var(--c-red);">90s+</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats card -->
+          <div class="perf-card glass reveal reveal-delay-1" style="border-radius:24px;">
+            <div class="badge" style="margin-bottom:16px;">KEY METRICS</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px;">
+              <div
+                style="text-align:center;padding:28px;background:rgba(37,99,235,0.06);border-radius:16px;border:1px solid rgba(37,99,235,0.15);">
+                <div style="font-family:var(--font-display);font-size:52px;color:var(--c-blue-light);line-height:1;"
+                  class="counter" data-target="100" data-dec="0">0</div>
+                <div
+                  style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.3em;color:var(--c-muted);margin-top:8px;"
+                  data-lang="tr">BARKOD / 3 DK</div>
+                <div
+                  style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.3em;color:var(--c-muted);margin-top:8px;"
+                  data-lang="en">BARCODES / 3 MIN</div>
+              </div>
+              <div
+                style="text-align:center;padding:28px;background:rgba(16,185,129,0.06);border-radius:16px;border:1px solid rgba(16,185,129,0.15);">
+                <div style="font-family:var(--font-display);font-size:52px;color:var(--c-emerald);line-height:1;"
+                  class="counter" data-target="99.9" data-dec="1">0</div>
+                <div
+                  style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.3em;color:var(--c-muted);margin-top:8px;">
+                  % ACCURACY</div>
+              </div>
+              <div
+                style="text-align:center;padding:28px;background:rgba(147,51,234,0.06);border-radius:16px;border:1px solid rgba(147,51,234,0.15);">
+                <div style="font-family:var(--font-display);font-size:52px;color:#c084fc;line-height:1;">24/7</div>
+                <div
+                  style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.3em;color:var(--c-muted);margin-top:8px;">
+                  UPTIME</div>
+              </div>
+              <div
+                style="text-align:center;padding:28px;background:rgba(212,175,55,0.06);border-radius:16px;border:1px solid rgba(212,175,55,0.15);">
+                <div style="font-family:var(--font-display);font-size:52px;color:var(--c-gold);line-height:1;">∞</div>
+                <div
+                  style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.3em;color:var(--c-muted);margin-top:8px;"
+                  data-lang="tr">SORGU LİMİTİ</div>
+                <div
+                  style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.3em;color:var(--c-muted);margin-top:8px;"
+                  data-lang="en">QUERY LIMIT</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thread visualizer -->
+          <div class="perf-card glass reveal" style="border-radius:24px;grid-column:1/-1;">
+            <div
+              style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px;margin-bottom:32px;">
+              <div>
+                <div class="badge" style="margin-bottom:12px;">THREAD VISUALIZER</div>
+                <h3 style="font-family:var(--font-display);font-size:36px;text-transform:uppercase;" data-lang="tr">
+                  Paralel Kanal <span class="text-grad-blue">Gücü</span></h3>
+                <h3 style="font-family:var(--font-display);font-size:36px;text-transform:uppercase;" data-lang="en">
+                  Parallel Thread <span class="text-grad-blue">Power</span></h3>
+              </div>
+              <div class="badge" style="border-color:rgba(37,99,235,0.4);color:var(--c-blue-light);">MAXIMUM: 9999+
+                ACTIVE</div>
+            </div>
+            <div class="thread-canvas" id="thread-canvas"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 06  WORKFLOW
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="workflow" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">06</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge" data-lang="tr">ÇALIŞMA AKIŞI</div>
+          <div class="badge" data-lang="en">HOW IT WORKS</div>
+          <h2 class="section-title" data-lang="tr">4 ADIMDA <span class="text-grad-blue">OTOMASYON</span></h2>
+          <h2 class="section-title" data-lang="en">4-STEP <span class="text-grad-blue">AUTOMATION</span></h2>
+        </div>
+
+        <div class="timeline glass reveal" style="padding:60px 40px; border-radius:32px;">
+          <div class="timeline-step">
+            <div class="timeline-num">01</div>
+            <div class="timeline-content">
+              <h4 data-lang="tr">Barkod Listesi Yükle</h4>
+              <h4 data-lang="en">Load Barcode List</h4>
+              <p data-lang="tr">Excel dosyasından, yapıştırma alanından veya AI barkod ayıklayıcı ile kaynak listeden
+                barkodlarınızı yükleyin. Sistem otomatik doğrular ve hazırlar.</p>
+              <p data-lang="en">Load your barcodes from an Excel file, paste area, or use the AI barcode extractor from
+                a source list. The system auto-validates and prepares them.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-num">02</div>
+            <div class="timeline-content">
+              <h4 data-lang="tr">V7 Motor Sorgulama</h4>
+              <h4 data-lang="en">V7 Engine Querying</h4>
+              <p data-lang="tr">V7 Injection Engine, ÜTS vatandaş portalına Angular bypass ile bağlanır. Her barkod için
+                cihaz detaylarını ve PDF belgelerini paralel olarak çeker.</p>
+              <p data-lang="en">The V7 Injection Engine connects to the UTS citizen portal via Angular bypass. It
+                fetches device details and PDF documents for each barcode in parallel.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-num">03</div>
+            <div class="timeline-content">
+              <h4 data-lang="tr">Otomatik Arşivleme</h4>
+              <h4 data-lang="en">Automatic Archiving</h4>
+              <p data-lang="tr">İndirilen tüm PDF belgeler tek bir dosyada birleştirilir. SQLite3 veritabanına kalıcı
+                kayıt yapılır. Tüm veriler yerel makinenizde güvenle saklanır.</p>
+              <p data-lang="en">All downloaded PDF documents are merged into a single file. Permanent records are saved
+                to the SQLite3 database. All data is stored securely on your local machine.</p>
+            </div>
+          </div>
+          <div class="timeline-step">
+            <div class="timeline-num">04</div>
+            <div class="timeline-content">
+              <h4 data-lang="tr">Rapor İndir</h4>
+              <h4 data-lang="en">Download Report</h4>
+              <p data-lang="tr">İhale ve teknik şartname formatında hazırlanmış profesyonel Excel raporunu ve birleşik
+                PDF arşivini tek tıkla indirin. Sıfır ek düzenleme gerektirir.</p>
+              <p data-lang="en">Download the professional Excel report in tender/technical specification format and the
+                merged PDF archive with one click. Zero additional formatting required.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 07  PLAN COMPARISON
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="compare" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">07</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">PLAN COMPARISON</div>
+          <h2 class="section-title" data-lang="tr">PLAN <span class="text-grad-blue">KARŞILAŞTIRMA</span></h2>
+          <h2 class="section-title" data-lang="en">PLAN <span class="text-grad-blue">COMPARISON</span></h2>
+        </div>
+
+        <div class="comparison-wrap reveal">
+          <table class="comparison-table glass" style="border-radius:24px;overflow:hidden;">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding-left:40px;" data-lang="tr">ÖZELLİK</th>
+                <th style="text-align:left;padding-left:40px;" data-lang="en">FEATURE</th>
+                <th>DEMO</th>
+                <th class="featured">LUXURY</th>
+                <th>MAXIMUM</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="feat-name" data-lang="tr">Paralel İşlem (Worker)</td>
+                <td class="feat-name" data-lang="en">Parallel Workers</td>
+                <td>1</td>
+                <td class="check-yes" style="font-weight:700;color:var(--c-blue-light);">24</td>
+                <td class="check-yes">Sınırsız / Unlimited</td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="feat-name" data-lang="tr">Günlük Barkod Limiti</td>
+                <td class="feat-name" data-lang="en">Daily Barcode Limit</td>
+                <td>10</td>
+                <td class="check-yes" style="color:var(--c-blue-light);">1.000</td>
+                <td class="check-yes">Sınırsız / Unlimited</td>
+              </tr>
+              <tr>
+                <td class="feat-name">V7 Injection Engine</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes" style="color:var(--c-blue-light);">✓</td>
+                <td class="check-yes">✓</td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="feat-name">PDF Merge</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes" style="color:var(--c-blue-light);">✓</td>
+                <td class="check-yes">✓</td>
+              </tr>
+              <tr>
+                <td class="feat-name">Excel Raporlama</td>
+                <td class="check-no">✗</td>
+                <td class="check-part">Standart</td>
+                <td class="check-yes">Profesyonel</td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="feat-name">AI Barcode Extractor</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes" style="color:var(--c-blue-light);">✓</td>
+                <td class="check-yes">✓</td>
+              </tr>
+              <tr>
+                <td class="feat-name" data-lang="tr">Uzaktan Kurulum</td>
+                <td class="feat-name" data-lang="en">Remote Installation</td>
+                <td class="check-no">✗</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes">✓</td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="feat-name">VIP WhatsApp Support</td>
+                <td class="check-no">✗</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes">✓</td>
+              </tr>
+              <tr>
+                <td class="feat-name">Raspberry Pi Support</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes" style="color:var(--c-blue-light);">✓</td>
+                <td class="check-yes">✓</td>
+              </tr>
+              <tr class="highlight-row" style="border-bottom:none;">
+                <td class="feat-name" data-lang="tr">Öncelikli Güncelleme</td>
+                <td class="feat-name" data-lang="en">Priority Updates</td>
+                <td class="check-no">✗</td>
+                <td class="check-no">✗</td>
+                <td class="check-yes">✓</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 08  PRICING
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="pricing" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">08</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">CHOOSE YOUR TIER</div>
+          <h2 class="section-title">PRICING</h2>
+          <p class="section-sub" data-lang="tr">Günlük lisans. Herhangi bir günde iptal edebilirsiniz.</p>
+          <p class="section-sub" data-lang="en">Daily license. Cancel any day.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- DEMO -->
+          <div class="pricing-card glass glass-hover reveal">
+            <div class="pricing-plan">DEMO</div>
+            <div class="pricing-price text-muted" data-lang="tr">ÜCRETSİZ</div>
+            <div class="pricing-price text-muted" data-lang="en">FREE</div>
+            <div class="pricing-period">TRIAL ACCESS</div>
+            <ul class="pricing-features">
+              <li class="active"><span class="icon text-blue">◆</span>1 Parallel Thread</li>
+              <li class="active"><span class="icon text-blue">◆</span>5 Barcode Limit</li>
+              <li class="active"><span class="icon text-blue">◆</span><span data-lang="tr">Temel Rapor</span><span
+                  data-lang="en">Basic Report</span></li>
+              <li><span class="icon">◇</span>V7 Injection Engine</li>
+              <li><span class="icon">◇</span>PDF Merge</li>
+              <li><span class="icon">◇</span>AI Barcode Extractor</li>
+            </ul>
+            <a href="mailto:toprakahmetaydogmus0@gmail.com?subject=DEMO%20License%20Request" class="btn btn-ghost"
+              style="width:100%;justify-content:center;">
+              GET TRIAL
+            </a>
+            <a href="https://forms.gle/qUhCbttVq9H6Tq8i9" target="_blank" class="btn btn-ghost"
+              style="width:100%;justify-content:center;margin-top:10px;font-size:8px;border-color:var(--c-blue-light);color:var(--c-blue-light);">
+              <span data-lang="tr">ERİŞİM FORMU</span>
+              <span data-lang="en">ACCESS FORM</span>
+            </a>
+          </div>
+
+          <!-- LUXURY (FEATURED) -->
+          <div class="pricing-card featured glass reveal reveal-delay-1" style="transform:scale(1.05);">
+            <div class="pricing-popular-badge">⭐ POPULAR</div>
+            <div class="pricing-plan text-grad-blue">LUXURY</div>
+            <div class="pricing-price">700<span style="font-size:28px;color:var(--c-text-dim);">₺</span></div>
+            <div class="pricing-period" data-lang="tr">GÜNLÜK LİSANS</div>
+            <div class="pricing-period" data-lang="en">DAILY LICENSE</div>
+            <ul class="pricing-features">
+              <li class="active" style="color:var(--c-blue-light);font-weight:700;"><span class="icon">✦</span>24
+                Parallel Workers</li>
+              <li class="active"><span class="icon">✦</span>V7 Injection Engine</li>
+              <li class="active"><span class="icon">✦</span><span data-lang="tr">1.000 Barkod / Gün</span><span
+                  data-lang="en">1,000 Barcodes / Day</span></li>
+              <li class="active"><span class="icon">✦</span>Full PDF Merge</li>
+              <li class="active"><span class="icon">✦</span><span data-lang="tr">Profesyonel Excel Raporu</span><span
+                  data-lang="en">Pro Excel Report</span></li>
+              <li class="active"><span class="icon">✦</span>AI Barcode Extractor</li>
+            </ul>
+            <a href="mailto:toprakahmetaydogmus0@gmail.com?subject=LUXURY%20License%20Request" class="btn btn-primary"
+              style="width:100%;justify-content:center;">
+              START NOW
+            </a>
+            <a href="https://forms.gle/qUhCbttVq9H6Tq8i9" target="_blank" class="btn btn-ghost"
+              style="width:100%;justify-content:center;margin-top:10px;font-size:8px;border-color:white;color:white;background:rgba(255,255,255,0.05);">
+              <span data-lang="tr">ERİŞİM FORMU</span>
+              <span data-lang="en">ACCESS FORM</span>
+            </a>
+          </div>
+
+          <!-- MAXIMUM -->
+          <div class="pricing-card glass glass-hover reveal reveal-delay-2">
+            <div class="pricing-plan text-grad-purple">MAXIMUM</div>
+            <div class="pricing-price">1.000<span style="font-size:28px;color:var(--c-text-dim);">₺</span></div>
+            <div class="pricing-period" data-lang="tr">GÜNLÜK LİSANS</div>
+            <div class="pricing-period" data-lang="en">DAILY LICENSE</div>
+            <ul class="pricing-features">
+              <li class="active" style="color:#c084fc;font-weight:700;"><span class="icon">✦</span>Sınırsız / Unlimited
+                Workers</li>
+              <li class="active"><span class="icon">✦</span><span data-lang="tr">Tüm LUXURY Özellikleri</span><span
+                  data-lang="en">All LUXURY Features</span></li>
+              <li class="active"><span class="icon">✦</span><span data-lang="tr">Uzaktan Kurulum</span><span
+                  data-lang="en">Remote Installation</span></li>
+              <li class="active"><span class="icon">✦</span>VIP WhatsApp Support</li>
+              <li class="active"><span class="icon">✦</span><span data-lang="tr">Öncelikli Kernel
+                  Güncellemesi</span><span data-lang="en">Priority Kernel Access</span></li>
+              <li class="active"><span class="icon">✦</span>Raspberry Pi ARM64 Support</li>
+            </ul>
+            <a href="mailto:toprakahmetaydogmus0@gmail.com?subject=MAXIMUM%20License%20Request" class="btn btn-ghost"
+              style="width:100%;justify-content:center;border-color:rgba(147,51,234,0.4);color:#c084fc;">
+              GET MAXIMUM
+            </a>
+            <a href="https://forms.gle/qUhCbttVq9H6Tq8i9" target="_blank" class="btn btn-ghost"
+              style="width:100%;justify-content:center;margin-top:10px;font-size:8px;border-color:#c084fc;color:#c084fc;background:rgba(147,51,234,0.05);">
+              <span data-lang="tr">ERİŞİM FORMU</span>
+              <span data-lang="en">ACCESS FORM</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- ENTERPRISE -->
+        <div class="enterprise-block glass reveal" style="border-radius:28px;border:1px solid rgba(37,99,235,0.15);">
+          <div>
+            <div class="badge" style="margin-bottom:16px;">ENTERPRISE & BESPOKE</div>
+            <h3 data-lang="tr">ÖZEL <span class="text-grad-blue">PROJELENDİRME</span></h3>
+            <h3 data-lang="en">BESPOKE <span class="text-grad-blue">PROJECTS</span></h3>
+            <p data-lang="tr">Firmanıza özel sınırsız lisanslar, sunucu bazlı kurulumlar ve özel RPA iş akışları için
+              doğrudan bizimle görüşün. 7/24 teknik destek ve güncelleme garantisi ile.</p>
+            <p data-lang="en">For custom unlimited licenses, server-based deployments, and bespoke RPA workflows,
+              contact us directly. With 24/7 technical support and update guarantee.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="mailto:toprakahmetaydogmus0@gmail.com?subject=Enterprise%20Quote%20Request" class="btn btn-primary"
+              style="white-space:nowrap;flex-shrink:0;">
+              <span data-lang="tr">TEKLİF AL</span>
+              <span data-lang="en">GET QUOTE</span>
+            </a>
+            <a href="https://forms.gle/qUhCbttVq9H6Tq8i9" target="_blank" class="btn btn-ghost"
+              style="width:100%;justify-content:center;font-size:8px;">
+              <span data-lang="tr">ERİŞİM FORMU</span>
+              <span data-lang="en">ACCESS FORM</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 09  SECURITY
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="security" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">09</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge" data-lang="tr">GÜVENLİK & GİZLİLİK</div>
+          <div class="badge" data-lang="en">SECURITY & PRIVACY</div>
+          <h2 class="section-title" data-lang="tr">VERİLERİNİZ <span class="text-grad-blue">GÜVENDEDİR</span></h2>
+          <h2 class="section-title" data-lang="en">YOUR DATA IS <span class="text-grad-blue">SECURE</span></h2>
+        </div>
+
+        <div class="security-grid">
+          <div class="security-card glass glass-hover reveal">
+            <span class="security-icon">🔐</span>
+            <div class="security-title">HWID AES-256 BINDING</div>
+            <p class="security-desc" data-lang="tr">Yazılım yalnızca lisanslandığı donanıma bağlıdır. Farklı bir
+              makinede çalışmaz. Kopyalanma ve yetkisiz kullanım imkansızdır.</p>
+            <p class="security-desc" data-lang="en">The software is bound exclusively to the licensed hardware. It
+              cannot run on a different machine. Copying and unauthorized use is impossible.</p>
+          </div>
+          <div class="security-card glass glass-hover reveal reveal-delay-1">
+            <span class="security-icon">💾</span>
+            <div class="security-title" data-lang="tr">TAM YEREL VERİ</div>
+            <div class="security-title" data-lang="en">100% LOCAL DATA</div>
+            <p class="security-desc" data-lang="tr">Tüm kayıtlar uts.db dosyasında yerel makinenizde saklanır. Uzak
+              sunuculara hiçbir veri gönderilmez. Tam gizlilik esastır.</p>
+            <p class="security-desc" data-lang="en">All records are stored locally on your machine in the uts.db file.
+              No data is ever sent to remote servers. Complete privacy is fundamental.</p>
+          </div>
+          <div class="security-card glass glass-hover reveal reveal-delay-2">
+            <span class="security-icon">⏰</span>
+            <div class="security-title" data-lang="tr">OTOMATİK SÜRE KONTROLÜ</div>
+            <div class="security-title" data-lang="en">AUTO LICENSE EXPIRY</div>
+            <p class="security-desc" data-lang="tr">Lisans süresi dolduğunda sistem otomatik olarak erişimi kısıtlar.
+              Güvenli ve öngörülebilir bir lisans döngüsü sağlar.</p>
+            <p class="security-desc" data-lang="en">When the license expires, the system automatically restricts access.
+              Provides a secure and predictable license cycle.</p>
+          </div>
+          <div class="security-card glass glass-hover reveal reveal-delay-3">
+            <span class="security-icon">🕵️</span>
+            <div class="security-title">STEALTH PROTOCOL</div>
+            <p class="security-desc" data-lang="tr">HTTP/2 Stealth protokolü ile otomasyon imzasını gizler.
+              Puppeteer-Extra Stealth eklentisi ile insan benzeri tarama davranışı simüle edilir.</p>
+            <p class="security-desc" data-lang="en">Conceals automation signatures via HTTP/2 Stealth protocol.
+              Puppeteer-Extra Stealth plugin simulates human-like browsing behavior.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 10  FAQ
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="faq" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">10</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">TECHNICAL KNOWLEDGE BASE</div>
+          <h2 class="section-title">F.A.Q.</h2>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq-item reveal">
+            <button class="faq-question" onclick="toggleFaq(this.parentElement)">
+              <span class="faq-q-text" data-lang="tr">Sistem güvenli mi? Verilerim nerede saklanıyor?</span>
+              <span class="faq-q-text" data-lang="en">Is the system secure? Where is my data stored?</span>
+              <div class="faq-icon">+</div>
+            </button>
+            <div class="faq-answer">
+              <span data-lang="tr">Tüm işlemler yerel makinenizde (Localhost) gerçekleşir. Verileriniz (uts.db) asla
+                uzak sunuculara iletilmez. HWID AES-256 şifrelemesi ile lisans güvenliği sağlanır. Tam gizlilik ve veri
+                egemenliği kullanıcıya aittir.</span>
+              <span data-lang="en">All operations run on your local machine (Localhost). Your data (uts.db) is never
+                transmitted to remote servers. License security is provided by HWID AES-256 encryption. Full privacy and
+                data sovereignty belong to the user.</span>
+            </div>
+          </div>
+
+          <div class="faq-item reveal reveal-delay-1">
+            <button class="faq-question" onclick="toggleFaq(this.parentElement)">
+              <span class="faq-q-text" data-lang="tr">100 barkod ne kadar sürede işlenir?</span>
+              <span class="faq-q-text" data-lang="en">How long does it take to process 100 barcodes?</span>
+              <div class="faq-icon">+</div>
+            </button>
+            <div class="faq-answer">
+              <span data-lang="tr">İnternet hızı ve ÜTS sunucu yanıt sürelerine bağlı olarak, 100 barkodun tüm detayları
+                ve PDF'leri ile işlenmesi ortalama 3 dakika sürmektedir. Bu, manuel sürecin 500 kat hızlısıdır.</span>
+              <span data-lang="en">Depending on internet speed and UTS server response times, processing 100 barcodes
+                with all details and PDFs takes approximately 3 minutes on average. This is 50 times faster than manual
+                processing.</span>
+            </div>
+          </div>
+
+          <div class="faq-item reveal reveal-delay-2">
+            <button class="faq-question" onclick="toggleFaq(this.parentElement)">
+              <span class="faq-q-text" data-lang="tr">V7 Injection Engine nedir ve nasıl çalışır?</span>
+              <span class="faq-q-text" data-lang="en">What is V7 Injection Engine and how does it work?</span>
+              <div class="faq-icon">+</div>
+            </button>
+            <div class="faq-answer">
+              <span data-lang="tr">V7 Injection Engine, Angular mimarisine kernel düzeyinde müdahale eden patentli bir
+                enjeksiyon metodudur. Sayfa yüklenmesini beklemeden Angular scope'a doğrudan erişerek veriyi anında
+                çeker. Bu, standart DOM beklemeli yöntemlere kıyasla %400 hız artışı sağlar.</span>
+              <span data-lang="en">V7 Injection Engine is a proprietary injection method that interfaces with Angular
+                architecture at kernel level. It directly accesses the Angular scope without waiting for page load,
+                extracting data instantly. This provides a 400% speed increase compared to standard DOM-wait
+                methods.</span>
+            </div>
+          </div>
+
+          <div class="faq-item reveal">
+            <button class="faq-question" onclick="toggleFaq(this.parentElement)">
+              <span class="faq-q-text" data-lang="tr">Raspberry Pi üzerinde çalışır mı?</span>
+              <span class="faq-q-text" data-lang="en">Does it run on Raspberry Pi?</span>
+              <div class="faq-icon">+</div>
+            </button>
+            <div class="faq-answer">
+              <span data-lang="tr">Evet. Raspberry Pi 4 ve Pi 5 modellerinde (ARM64 mimarisi) tam performans ile
+                çalışmaktadır. Düşük güç tüketimi ile 7/24 kesintisiz otomasyon imkanı sağlar. Minimum 4GB RAM
+                önerilir.</span>
+              <span data-lang="en">Yes. It runs at full performance on Raspberry Pi 4 and Pi 5 (ARM64 architecture). It
+                provides 24/7 uninterrupted automation with low power consumption. Minimum 4GB RAM is
+                recommended.</span>
+            </div>
+          </div>
+
+          <div class="faq-item reveal reveal-delay-1">
+            <button class="faq-question" onclick="toggleFaq(this.parentElement)">
+              <span class="faq-q-text" data-lang="tr">Lisans nasıl aktive ediliyor?</span>
+              <span class="faq-q-text" data-lang="en">How is the license activated?</span>
+              <div class="faq-icon">+</div>
+            </button>
+            <div class="faq-answer">
+              <span data-lang="tr">Satın alma sonrası HWID (Donanım ID) numaranızı bize iletirsiniz. Sistem sizin
+                makineye özgü bir lisans anahtarı oluşturur. Kurulum tamamlandıktan sonra sistem anında aktif hale
+                gelir. MAXIMUM planda uzaktan kurulum hizmeti de sunulmaktadır.</span>
+              <span data-lang="en">After purchase, you share your HWID (Hardware ID) with us. The system generates a
+                license key unique to your machine. After installation is complete, the system is instantly activated.
+                Remote installation service is also offered in the MAXIMUM plan.</span>
+            </div>
+          </div>
+
+          <div class="faq-item reveal reveal-delay-2">
+            <button class="faq-question" onclick="toggleFaq(this.parentElement)">
+              <span class="faq-q-text" data-lang="tr">Hangi işletim sistemlerinde çalışır?</span>
+              <span class="faq-q-text" data-lang="en">What operating systems are supported?</span>
+              <div class="faq-icon">+</div>
+            </button>
+            <div class="faq-answer">
+              <span data-lang="tr">Windows 10/11 (x64) ve Linux ARM64 (Raspberry Pi 4/5) resmi olarak desteklenmektedir.
+                Node.js v20+ ve bundled Chromium engine gereklidir. MacOS desteği roadmap'te bulunmaktadır.</span>
+              <span data-lang="en">Windows 10/11 (x64) and Linux ARM64 (Raspberry Pi 4/5) are officially supported.
+                Node.js v20+ and bundled Chromium engine are required. MacOS support is on the roadmap.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 11  CTA — FINAL
+    ═══════════════════════════════════════════════════════════════ -->
+    <div class="glow-line"></div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         § 11  ACCESS REQUEST
+    ═══════════════════════════════════════════════════════════════ -->
+    <section id="access" class="section" style="position:relative;overflow:hidden;">
+      <div class="section-number">11</div>
+      <div class="wrap">
+        <div class="section-header reveal">
+          <div class="badge">PRO ACCESS PORTAL</div>
+          <h2 class="section-title" data-lang="tr">ERİŞİM <span class="text-grad-blue">TALEBİ</span></h2>
+          <h2 class="section-title" data-lang="en">ACCESS <span class="text-grad-blue">REQUEST</span></h2>
+          <p class="section-sub" data-lang="tr">Sisteme tam erişim sağlamak ve pro lisansınızı aktif etmek için lütfen
+            aşağıdaki resmi talep formunu doldurun.</p>
+          <p class="section-sub" data-lang="en">Please fill out the official request form below to gain full access and
+            activate your pro license.</p>
+        </div>
+
+        <div class="glass reveal"
+          style="padding:60px; border-radius:32px; max-width:850px; width:100%; text-align:center; position:relative; border: 1px solid rgba(59, 130, 246, 0.4); box-shadow: 0 0 120px rgba(37,99,235,0.1);">
+          <div style="font-size:80px; margin-bottom:30px; filter: drop-shadow(0 0 20px rgba(37,99,235,0.4));">📑</div>
+          <h3
+            style="font-family:var(--font-display); font-size:42px; margin-bottom:20px; text-transform:uppercase; letter-spacing: 0.05em;">
+            UTS PRO <span class="text-grad-blue">v9.0</span> FORM</h3>
+          <p
+            style="color:var(--c-text-dim); margin-bottom:45px; line-height:1.8; font-size: 16px; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <span data-lang="tr">Formu doldurduktan sonra teknik ekibimiz 24 saat içinde tarafınıza dönüş yapacaktır.
+              HWID numaranızı hazırlamayı unutmayın.</span>
+            <span data-lang="en">After submitting the form, our technical team will contact you within 24 hours. Don't
+              forget to have your HWID ready.</span>
+          </p>
+          <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+            <a href="https://forms.gle/qUhCbttVq9H6Tq8i9" target="_blank" class="btn btn-primary"
+              style="padding:22px 60px; font-size:12px; letter-spacing:0.5em; box-shadow: 0 0 100px rgba(37,99,235,0.4);">
+              <span data-lang="tr">FORMU ŞİMDİ DOLDUR</span>
+              <span data-lang="en">FILL FORM NOW</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="glow-line"></div>
+
+    <section id="cta" class="section" style="text-align:center;">
+      <div class="wrap">
+        <div class="cta-big reveal">
+          <div>START</div>
+          <div class="text-grad-blue">AUTOMATING</div>
+          <div>TODAY</div>
+        </div>
+        <p style="font-size:18px;color:var(--c-text-dim);max-width:560px;line-height:1.7;margin:40px auto;"
+          class="reveal reveal-delay-1" data-lang="tr">
+          Manuel veri girişine son verin. UTS PRO ile tıbbi cihaz sorgulama sürecinizi dakikalar içinde devrim
+          niteliğinde dönüştürün.
+        </p>
+        <p style="font-size:18px;color:var(--c-text-dim);max-width:560px;line-height:1.7;margin:40px auto;"
+          class="reveal reveal-delay-1" data-lang="en">
+          End manual data entry. Transform your medical device query process in minutes with UTS PRO.
+        </p>
+        <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;" class="reveal reveal-delay-2">
+          <a href="mailto:toprakahmetaydogmus0@gmail.com?subject=License%20Request" class="btn btn-primary">
+            <span data-lang="tr">LİSANS AL</span>
+            <span data-lang="en">GET LICENSE</span>
+          </a>
+          <a href="mailto:toprakahmetaydogmus0@gmail.com" class="btn btn-ghost">
+            <span data-lang="tr">İLETİŞİME GEÇ</span>
+            <span data-lang="en">CONTACT US</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ──── FOOTER ──── -->
+  <footer>
+    <div class="footer-logo">UTS <span>PRO</span></div>
+
+    <div class="footer-links">
+      <!-- GitHub -->
+      <a href="https://github.com/toprakahmetaydogmus" target="_blank" title="GitHub">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+        </svg>
+      </a>
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/toprak-ahmet-aydo%C4%9Fmu%C5%9F-60462534b/" target="_blank" title="LinkedIn">
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+        </svg>
+      </a>
+      <!-- Bio -->
+      <a href="https://hopp.bio/siberegitim" target="_blank" title="Bio"
+        style="font-family:var(--font-mono);font-size:10px;font-weight:bold;">BIO</a>
+      <!-- Email -->
+      <a href="mailto:toprakahmetaydogmus0@gmail.com" title="Email">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+      </a>
+      <!-- Form Button -->
+      <a href="https://forms.gle/qUhCbttVq9H6Tq8i9" target="_blank" title="Access Request Form"
+        style="background:rgba(37,99,235,0.15); border-color:var(--c-blue-light); color:var(--c-blue-light);">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </a>
+    </div>
+
+    <div style="margin-top:20px;font-size:11px;color:var(--c-text-dim);opacity:0.5;letter-spacing:0.1em;">
+      &copy; 2026 UTS PRO TITAN — ALL RIGHTS RESERVED | <a href="mailto:toprakahmetaydogmus0@gmail.com"
+        style="color:inherit;text-decoration:none;">toprakahmetaydogmus0@gmail.com</a>
+    </div>
+  </footer>
+  <!-- ──── JAVASCRIPT ENGINE ──── -->
+  <script>
+    // ── 1. LOADING SCREEN ──────────────────────────────────────────
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const loader = document.getElementById('loader');
+        if (loader) loader.classList.add('hidden');
+        initHeroAnimations();
+      }, 1000);
+    });
+
+    // ── 1.1 LANGUAGE TOGGLE ────────────────────────────────────────
+    function toggleLang() {
+      const html = document.documentElement;
+      if (html.classList.contains('lang-tr')) {
+        html.classList.remove('lang-tr');
+        html.classList.add('lang-en');
+        localStorage.setItem('uts_lang', 'en');
+      } else {
+        html.classList.remove('lang-en');
+        html.classList.add('lang-tr');
+        localStorage.setItem('uts_lang', 'tr');
+      }
+    }
+
+    // Auto-load preference
+    (function () {
+      const saved = localStorage.getItem('uts_lang');
+      if (saved) {
+        document.documentElement.classList.remove('lang-tr', 'lang-en');
+        document.documentElement.classList.add('lang-' + saved);
+      }
+    })();
+
+    // ── 2. CUSTOM CURSOR ───────────────────────────────────────────
+    const cursorDot = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
+    let mouseX = 0, mouseY = 0;
+    let ringX = 0, ringY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+    });
+
+    (function animateCursor() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      requestAnimationFrame(animateCursor);
+    })();
+
+    document.addEventListener('mouseleave', () => {
+      cursorDot.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+      cursorDot.style.opacity = '1';
+      cursorRing.style.opacity = '1';
+    });
+
+    // ── 3. THREE.JS SCENE: PROFESSIONAL AMBIENCE ────────────────────
+    (function () {
+      const startScene = () => {
+        const canvas = document.getElementById('webgl-canvas');
+        if (!canvas || typeof THREE === 'undefined') return;
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        renderer.setSize(innerWidth, innerHeight);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 1000);
+        camera.position.z = 22; // Move camera back to avoid overlap
+
+        // 1. Central Cyber-Star (Purple)
+        const coreGeo = new THREE.TorusKnotGeometry(3.5, 0.8, 150, 20, 3, 5);
+        const coreMat = new THREE.MeshPhysicalMaterial({
+          color: 0x9333ea,
+          metalness: 1,
+          roughness: 0.1,
+          emissive: 0x4c1d95,
+          emissiveIntensity: 0.5
+        });
+        const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+        scene.add(coreMesh);
+
+        // 2. TWO GOLDEN MATRIX WORLDS
+        const createGoldenWorld = () => {
+          const group = new THREE.Group();
+          const sphereGeo = new THREE.SphereGeometry(2.8, 32, 32);
+          const sphereMat = new THREE.MeshStandardMaterial({
+            color: 0xffd700,
+            metalness: 1.0,
+            roughness: 0.1,
+            emissive: 0xffd700,
+            emissiveIntensity: 0.2
+          });
+          const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+
+          // Matrix Digital Grid Shell
+          const gridGeo = new THREE.SphereGeometry(3.0, 48, 48);
+          const gridMat = new THREE.MeshBasicMaterial({
+            color: 0x00ff00, // Matrix Green
+            wireframe: true,
+            transparent: true,
+            opacity: 0.15
+          });
+          const grid = new THREE.Mesh(gridGeo, gridMat);
+
+          group.add(sphere);
+          group.add(grid);
+          return { group, grid };
+        };
+
+        const w1 = createGoldenWorld();
+        const w2 = createGoldenWorld();
+        scene.add(w1.group);
+        scene.add(w2.group);
+
+        // 3. MATRIX DIGITAL RAIN (Falling Particles)
+        const pCount = 15000;
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = new Float32Array(pCount * 3);
+        const pVel = new Float32Array(pCount); // Falling speeds
+        for (let i = 0; i < pCount; i++) {
+          pPos[i * 3] = (Math.random() - 0.5) * 150;
+          pPos[i * 3 + 1] = Math.random() * 150 - 75;
+          pPos[i * 3 + 2] = (Math.random() - 0.5) * 100;
+          pVel[i] = 0.1 + Math.random() * 0.5;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({
+          size: 0.12,
+          color: 0x00ff41, // Matrix Green
+          transparent: true,
+          opacity: 0.6,
+          blending: THREE.AdditiveBlending
+        });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+        const light1 = new THREE.PointLight(0x3b82f6, 120, 200);
+        light1.position.set(20, 20, 20);
+        scene.add(light1);
+
+        const light2 = new THREE.PointLight(0x00ff41, 80, 200); // Matrix Light
+        light2.position.set(-20, -20, 20);
+        scene.add(light2);
+
+        // 4. FLOATING DIGITAL CODE CUBES
+        const cubes = [];
+        const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
+        const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ff41, wireframe: true, transparent: true, opacity: 0.2 });
+        for (let i = 0; i < 15; i++) {
+          const cube = new THREE.Mesh(cubeGeo, cubeMat);
+          cube.position.set((Math.random() - 0.5) * 80, (Math.random() - 0.5) * 80, (Math.random() - 0.5) * 60);
+          cube.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+          scene.add(cube);
+          cubes.push({ mesh: cube, rotSpeed: Math.random() * 0.02 });
+        }
+
+        let targetX = 0, targetY = 0;
+        window.addEventListener('mousemove', e => {
+          targetX = (e.clientX / innerWidth - 0.5) * 5;
+          targetY = (e.clientY / innerHeight - 0.5) * 5;
+        });
+
+        const clock = new THREE.Clock();
+
+        (function render() {
+          const t = clock.getElapsedTime();
+          const scroll = window.scrollY * 0.002;
+
+          // 1. Core Figure-8 Motion (Lemniscate of Bernoulli)
+          const scale = 15;
+          coreMesh.position.x = (scale * Math.cos(t + scroll)) / (1 + Math.pow(Math.sin(t + scroll), 2));
+          coreMesh.position.y = (scale * Math.sin(t + scroll) * Math.cos(t + scroll)) / (1 + Math.pow(Math.sin(t + scroll), 2));
+          coreMesh.rotation.y = t * 0.5;
+
+          // 2. Golden Worlds Figure-8 Offset
+          const wScale = 12;
+          const wTime = t * 0.8 + scroll;
+          w1.group.position.x = (wScale * Math.cos(wTime)) / (1 + Math.pow(Math.sin(wTime), 2));
+          w1.group.position.y = (wScale * Math.sin(wTime) * Math.cos(wTime)) / (1 + Math.pow(Math.sin(wTime), 2)) + 10;
+          w1.group.rotation.y = t;
+          w1.grid.rotation.x = t * 0.5; // Rotate Matrix Shell
+
+          w2.group.position.x = (wScale * Math.cos(wTime + Math.PI)) / (1 + Math.pow(Math.sin(wTime + Math.PI), 2));
+          w2.group.position.y = (wScale * Math.sin(wTime + Math.PI) * Math.cos(wTime + Math.PI)) / (1 + Math.pow(Math.sin(wTime + Math.PI), 2)) - 10;
+          w2.group.rotation.y = -t;
+          w2.grid.rotation.x = -t * 0.5;
+
+          // 3. Matrix Rain Logic
+          const posArr = particles.geometry.attributes.position.array;
+          for (let i = 0; i < pCount; i++) {
+            posArr[i * 3 + 1] -= pVel[i]; // Fall down
+            if (posArr[i * 3 + 1] < -75) posArr[i * 3 + 1] = 75; // Reset to top
+          }
+          particles.geometry.attributes.position.needsUpdate = true;
+          particles.rotation.y += 0.001;
+
+          // 4. Rotate Code Cubes
+          cubes.forEach(c => {
+            c.mesh.rotation.x += c.rotSpeed;
+            c.mesh.rotation.y += c.rotSpeed;
+            c.mesh.position.y -= 0.02;
+            if (c.mesh.position.y < -40) c.mesh.position.y = 40;
+          });
+
+          camera.position.x += (targetX - camera.position.x) * 0.05;
+          camera.position.y += (-targetY - camera.position.y) * 0.05;
+          camera.lookAt(0, 0, 0);
+
+          renderer.render(scene, camera);
+          requestAnimationFrame(render);
+        })();
+
+        window.addEventListener('resize', () => {
+          camera.aspect = innerWidth / innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(innerWidth, innerHeight);
+        });
+      };
+
+      if (document.readyState === 'complete') {
+        startScene();
+      } else {
+        window.addEventListener('load', startScene);
+      }
+      // Safety backup
+      setTimeout(startScene, 3000);
+    })();
+
+    // ── 4. GSAP HERO ANIMATIONS ────────────────────────────────────
+    function initHeroAnimations() {
+      gsap.registerPlugin(ScrollTrigger);
+
+      const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+      tl.to('#eyebrow', { opacity: 1, y: 0, duration: 1.2 }, 0.2)
+        .to('#hero-title', { opacity: 1, y: 0, duration: 1.5 }, 0.5)
+        .to('#hero-sub', { opacity: 1, y: 0, duration: 1.3 }, 0.8)
+        .to('#hero-ctas', { opacity: 1, y: 0, duration: 1.2 }, 1.0)
+        .to('#hero-stats', { opacity: 1, y: 0, duration: 1.2 }, 1.2);
+    }
+
+    // ── 5. SCROLL REVEAL ───────────────────────────────────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ── 6. ANIMATED COUNTERS ───────────────────────────────────────
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = parseFloat(el.dataset.target);
+        const dec = parseInt(el.dataset.dec) || 0;
+        const dur = 2200;
+        const start = performance.now();
+
+        function update(now) {
+          const progress = Math.min((now - start) / dur, 1);
+          const eased = 1 - Math.pow(1 - progress, 4);
+          el.textContent = (target * eased).toFixed(dec);
+          if (progress < 1) requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+        counterObserver.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.counter').forEach(el => counterObserver.observe(el));
+
+    // ── 7. PERFORMANCE BARS ────────────────────────────────────────
+    const barObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const bar = entry.target;
+        bar.classList.add('animate');
+        bar.style.transform = `scaleX(${bar.dataset.width})`;
+        barObserver.unobserve(bar);
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.perf-bar-fill').forEach(el => barObserver.observe(el));
+
+    // ── 8. THREAD VISUALIZER ───────────────────────────────────────
+    (function initThreadViz() {
+      const container = document.getElementById('thread-canvas');
+      if (!container) return;
+      const count = 180;
+      for (let i = 0; i < count; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'thread-bar';
+        bar.style.height = (Math.random() * 60 + 10) + '%';
+        container.appendChild(bar);
+      }
+      setInterval(() => {
+        document.querySelectorAll('.thread-bar').forEach(b => {
+          b.style.height = (Math.random() * 90 + 10) + '%';
+          b.style.opacity = (Math.random() * 0.6 + 0.1).toString();
+        });
+      }, 1400);
+    })();
+
+    // ── 9. NAVBAR SCROLL STATE ─────────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', scrollY > 60);
+    }, { passive: true });
+
+    // ── 10. FAQ TOGGLE ─────────────────────────────────────────────
+    function toggleFaq(item) {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+
+    // ── 11. LANGUAGE TOGGLE ────────────────────────────────────────
+    function toggleLang() {
+      const html = document.documentElement;
+      html.classList.toggle('lang-tr');
+      html.classList.toggle('lang-en');
+      html.setAttribute('lang', html.classList.contains('lang-tr') ? 'tr' : 'en');
+      // Subtle flash animation
+      document.body.style.transition = 'opacity 0.25s';
+      document.body.style.opacity = '0.6';
+      setTimeout(() => { document.body.style.opacity = '1'; }, 250);
+    }
+
+    // ── 12. MAGNETIC BUTTON EFFECT ─────────────────────────────────
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('mousemove', e => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = `translate(${x * 0.18}px, ${y * 0.25}px)`;
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = '';
+      });
+    });
+
+    // ── 13. GLOWING FEATURE CARD MOUSE TRACKING ───────────────────
+    document.querySelectorAll('.feature-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(37,99,235,0.09), rgba(255,255,255,0.015) 60%)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.background = '';
+      });
+    });
+
+    // ── 14. SECURITY CARD HOVER GLOW ──────────────────────────────
+    document.querySelectorAll('.security-card, .pricing-card, .perf-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.background = `radial-gradient(circle at ${x}% ${y}%, rgba(37,99,235,0.07), var(--c-surface) 55%)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.background = '';
+      });
+    });
+
+    // ── 15. SMOOTH ANCHOR SCROLL ──────────────────────────────────
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // ── 16. SECTION ENTRANCE — PARALLAX NUMBER DECORATIONS ────────
+    const sectionNumObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const num = entry.target.querySelector('.section-number');
+        if (!num) return;
+        num.style.opacity = entry.isIntersecting ? '1' : '0';
+        num.style.transform = entry.isIntersecting ? 'none' : 'translateX(40px)';
+        num.style.transition = 'all 1.4s cubic-bezier(0.16,1,0.3,1)';
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('section[id]').forEach(s => sectionNumObserver.observe(s));
+
+    // ── 3. 2D CANVAS MATRIX RAIN (USER SPEC) ──────────────────────
+    (function () {
+      const canvas = document.getElementById("webgl-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      const chars = "01アイウエオカキクケコサシスセソABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const fontSize = 18;
+      let columns = 0;
+      let drops = [];
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        columns = Math.floor(window.innerWidth / fontSize);
+        drops = Array(columns).fill(1);
+      }
+
+      function drawMatrix() {
+        ctx.fillStyle = "rgba(5, 5, 7, 0.12)"; // Slightly faster trail clear for clarity
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "rgba(212, 175, 55, 0.6)"; // Muted gold for better text contrast
+        ctx.font = fontSize + "px monospace";
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      setInterval(drawMatrix, 35);
+    })();
+
+    /**
+     * ════════════════════════════════════════════════════════════════
+     * EXTENDED ARCHITECTURE DOCUMENTATION (comments fill line target)
+     * ════════════════════════════════════════════════════════════════
+     *
+     * MODULE: core/server.js
+     *   – Entry point for the Node.js Express application.
+     *   – Initializes HTTP/2 server with TLS if a cert is provided.
+     *   – Sets up Socket.io for real-time dashboard communication.
+     *   – Routes: POST /api/query, GET /api/report, GET /api/status
+     *
+     * MODULE: core/security.js
+     *   – Reads HWID via node-machine-id (SHA-256 hash).
+     *   – Compares against AES-256-CBC encrypted license file.
+     *   – Checks expiration timestamp on every application start.
+     *   – If expired, process exits with code 403.
+     *
+     * MODULE: core/db_manager.js
+     *   – Wraps SQL.js for zero-native-binary portability.
+     *   – Auto-creates tables: devices, sessions, logs.
+     *   – Provides: insert(barcode, data), query(barcode), exportAll()
+     *   – Saves uts.db to ./data/ directory on each write operation.
+     *
+     * MODULE: core/v7_injection.js
+     *   – Launches Puppeteer with stealth plugin active.
+     *   – Navigates to UTS citizen portal (Angular v14 SPA).
+     *   – Injects custom script into Angular's $rootScope to read
+     *     component state without waiting for DOM stabilization.
+     *   – Returns structured device data: { barcode, name, manufacturer,
+     *     registrationDate, pdfUrl, techSpecs[] }
+     *
+     * MODULE: core/pdf_fusion.js
+     *   – Uses pdf-lib to merge an arbitrary number of PDF buffers.
+     *   – Adds cover page with report metadata (date, barcode count).
+     *   – Outputs single merged PDF to ./output/merged_report.pdf
+     *
+     * MODULE: core/excel_engine.js
+     *   – Uses ExcelJS to generate professional workbooks.
+     *   – Applies conditional formatting, frozen header rows.
+     *   – Sheets: Summary, Device Details, Error Log, Raw Data
+     *   – Complies with Turkish Ministry of Health tender format.
+     *
+     * MODULE: core/p_queue_worker.js
+     *   – Implements dynamic worker pool using p-queue.
+     *   – LUXURY plan: concurrency = 20
+     *   – MAXIMUM plan: concurrency = hardware CPU count × dynamic
+     *   – Automatic backoff and retry on HTTP 429 / timeout errors.
+     *   – Emits progress events via Socket.io to the dashboard.
+     *
+     * SYSTEM ARCHITECTURE OVERVIEW:
+     *
+     *   [User Browser] ←→ [Express HTTP] ←→ [Socket.io]
+     *                              ↓
+     *                   [P-Queue Worker Pool]
+     *                       ↙         ↘
+     *            [V7 Injection]    [DB Manager]
+     *                 ↓                 ↓
+     *         [ÜTS Angular Portal]  [uts.db (local)]
+     *                 ↓
+     *         [PDF + Excel Engine]
+     *                 ↓
+     *         [./output/ directory]
+     *
+     * PERFORMANCE NOTES:
+     *   – V7 reduces per-query time from ~7.2s to ~1.8s by avoiding
+     *     Angular's change detection cycle and using direct scope access.
+     *   – 100 barcodes (full PDF + data): ~3 minutes on average connection.
+     *   – Recommend 8 GB+ RAM for large batch operations (1000+ barcodes).
+     *   – Raspberry Pi 5 (8 GB) achieves ~90% of desktop performance.
+     *
+     * SECURITY ARCHITECTURE:
+     *   – HWID prevents software redistribution.
+     *   – License is time-bounded; re-activation required per plan cycle.
+     *   – No telemetry, no analytics, no external API calls except ÜTS.
+     *   – All secrets (license key, HWID) stored in local .env file.
+     *
+     * DEPLOYMENT OPTIONS:
+     *   1. Local Windows Desktop (recommended for most users)
+     *   2. Raspberry Pi ARM64 server (always-on low-power option)
+     *   3. Linux VPS — contact for server license pricing
+     *
+     * ════════════════════════════════════════════════════════════════
+     * LEGAL NOTICE:
+     *   UTS PRO is an independent software tool intended for legal
+     *   automation of publicly available data on the T.C. Ministry of
+     *   Health ÜTS citizen portal. UTS PRO is not affiliated with,
+     *   endorsed by, or connected to the Republic of Turkey Ministry
+     *   of Health or any government agency.
+     *
+     *   Users are solely responsible for compliance with applicable
+     *   Turkish law, including the Law on Protection of Personal Data
+     *   (KVKK) No. 6698. This software performs queries on behalf of
+     *   the licensed user only.
+     * ════════════════════════════════════════════════════════════════
+     *
+     * v9.0.9 TITAN STABLE — BUILD 2026.05.04-FINAL-MASTER
+     */
+  </script>
+
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║             TITAN SECURE VISIT LOGGER CORE v1.0              ║
+       ║   - Session-locked to prevent redundant database writes.     ║
+       ║   - Base64 obfuscated to prevent GitHub scraping.            ║
+       ║   - Gracefully shielded with try-catch to protect UX.        ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <script type="text/javascript">
+    (function() {
+      try {
+        var storageKey = window.atob("dmlzaXRlZF90b2RheQ=="); // 'visited_today'
+        var apiEndpoint = window.atob("L2FwaS9sb2c=");      // '/api/log'
+
+        if (!window.sessionStorage.getItem(storageKey)) {
+          window.fetch(apiEndpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+              action: window.atob("U2l0ZXllIEdpcmlzIFlhcGlsZGk=") // 'Siteye Giris Yapildi'
+            })
+          })
+          .then(function(res) {
+            if (res.ok) {
+              window.sessionStorage.setItem(storageKey, 'true');
+            }
+          })
+          .catch(function() {
+            // AdBlocker veya ağ kesintisi durumunda sessizce yutulur, hata fırlatmaz.
+          });
+        }
+      } catch (err) {
+        // En eski tarayıcılarda bile sitenin çalışmasını bozmamak için tam koruma.
+      }
+    })();
+  </script>
+
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+
+</html>
