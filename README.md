@@ -1,10 +1,3 @@
-<div align="center">
-  <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" alt="UTS PRO Logo" width="80" height="80">
-  <h1>UTS PRO v9.0 TURBO</h1>
-  <p><b>Tıbbi Cihaz Barkod Doğrulama ve Otomasyon Motoru</b></p>
-</div>
-
----
 
 ## 🚀 Proje Hakkında
 
