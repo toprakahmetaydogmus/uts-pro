@@ -4,8 +4,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Sadece POST desteklenir' });
   }
 
-  // Vercel entegrasyonu sayesinde bu gizli anahtarlar otomatik gelir.
-  // Asla GitHub'da veya tarayıcıda görünmez.
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -14,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Ziyaretçinin IP, Ülke ve Şehir bilgilerini Vercel üzerinden güvenle al
+    // Ziyaretçinin IP, Ülke ve Şehir bilgilerini güvenle alma kodu
     const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || 'Gizli IP';
     const userAgent = req.headers['user-agent'] || 'Bilinmiyor';
     const country = req.headers['x-vercel-ip-country'] || 'Bilinmiyor';
@@ -22,7 +20,6 @@ export default async function handler(req, res) {
     
     const { action } = req.body;
 
-    // Supabase API'sine Kütüphanesiz Doğrudan Güvenli İstek (Zero-dependency)
     const response = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
       method: 'POST',
       headers: {
