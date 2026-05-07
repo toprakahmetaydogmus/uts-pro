@@ -1,77 +1,104 @@
+// ════════════════════════════════════════════════════════════════
+//  UTS PRO — Subscribe API  |  Vercel Serverless Function
+//  KVKK/GDPR Uyumlu · Zero-dependency · Supabase REST
+// ════════════════════════════════════════════════════════════════
+
 export default async function handler(req, res) {
-  // Only allow POST requests
+
+  // ── 1. Yöntem Kontrolü ────────────────────────────────────────
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Sadece POST desteklenir' });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceKey) {
-    return res.status(500).json({ error: 'Supabase anahtarları Vercel panelinde bulunamadı' });
-  }
-
-  const { email, phone } = req.body;
-  if (!email || !email.includes('@')) {
+  // ── 2. E-posta Doğrulama ──────────────────────────────────────
+  const { email, phone } = req.body || {};
+  if (!email || !email.includes('@') || !email.includes('.')) {
     return res.status(400).json({ error: 'Geçersiz e-posta adresi' });
   }
 
-  try {
-    // Get visitor location and IP safely from Vercel headers
-    const ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || 'Gizli IP';
-    const userAgent = req.headers['user-agent'] || 'Bilinmiyor';
-    const country = req.headers['x-vercel-ip-country'] || 'Bilinmiyor';
-    const city = req.headers['x-vercel-ip-city'] || 'Bilinmiyor';
+  // ── 3. Metadata ───────────────────────────────────────────────
+  const ip        = (req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || '').split(',')[0].trim() || null;
+  const userAgent = req.headers['user-agent']          || null;
+  const country   = req.headers['x-vercel-ip-country'] || null;
+  const city      = req.headers['x-vercel-ip-city']    || null;
 
-    // 1. Attempt to save to 'subscribers' table first
-    let response = await fetch(`${supabaseUrl}/rest/v1/subscribers`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': serviceKey,
-        'Authorization': `Bearer ${serviceKey}`,
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify({
-        email: email,
-        phone: phone || null,
-        ip_address: ip,
-        user_agent: userAgent,
-        country: country,
-        city: city
-      })
-    });
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanPhone = phone?.trim() || null;
 
-    // 2. If 'subscribers' table doesn't exist (returns 404 or fails), fallback to 'visitor_logs'
-    if (!response.ok) {
-      console.log("'subscribers' tablosu bulunamadı veya yazma başarısız oldu, 'visitor_logs' tablosuna yedekleniyor...");
-      
-      const fallbackResponse = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': serviceKey,
-          'Authorization': `Bearer ${serviceKey}`
+  // ── 4. Vercel Log (her zaman çalışır — Supabase olmasa bile) ──
+  console.log(JSON.stringify({
+    event     : 'subscribe',
+    email     : cleanEmail,
+    phone     : cleanPhone,
+    ip, country, city,
+    ts        : new Date().toISOString(),
+  }));
+
+  // ── 5. Supabase (opsiyonel — yoksa yine 200 döner) ───────────
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (supabaseUrl && serviceKey) {
+    try {
+
+      // 5a. subscribers tablosuna yaz
+      const subRes = await fetch(`${supabaseUrl}/rest/v1/subscribers`, {
+        method  : 'POST',
+        headers : {
+          'Content-Type'  : 'application/json',
+          'apikey'        : serviceKey,
+          'Authorization' : `Bearer ${serviceKey}`,
+          'Prefer'        : 'return=minimal',
         },
         body: JSON.stringify({
-          ip_address: ip,
-          action: `Abone Olundu: ${email}${phone ? ' | Tel: ' + phone : ''}`,
-          user_agent: userAgent,
-          country: country,
-          city: city
-        })
+          email      : cleanEmail,
+          phone      : cleanPhone,
+          ip_address : ip,
+          user_agent : userAgent,
+          country,
+          city,
+        }),
       });
 
-      if (!fallbackResponse.ok) {
-        const errText = await fallbackResponse.text();
-        console.error("Yedekleme log kaydı da başarısız oldu:", errText);
-        throw new Error("Supabase kayıt başarısız");
+      if (subRes.ok) {
+        // ✅ subscribers tablosuna yazıldı
+        return res.status(200).json({ success: true });
       }
-    }
 
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error("Abone Kayıt Hatası:", err);
-    return res.status(500).json({ error: 'İşlem tamamlanamadı' });
+      // 5b. subscribers başarısız → visitor_logs'a yedekle
+      console.warn('[subscribe] subscribers tablosu başarısız, visitor_logs\'a yedekleniyor...');
+
+      const logRes = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
+        method  : 'POST',
+        headers : {
+          'Content-Type'  : 'application/json',
+          'apikey'        : serviceKey,
+          'Authorization' : `Bearer ${serviceKey}`,
+          'Prefer'        : 'return=minimal',
+        },
+        body: JSON.stringify({
+          ip_address : ip,
+          action     : `Abone: ${cleanEmail}${cleanPhone ? ' | Tel: ' + cleanPhone : ''}`,
+          user_agent : userAgent,
+          country,
+          city,
+        }),
+      });
+
+      if (!logRes.ok) {
+        const errText = await logRes.text();
+        console.error('[subscribe] visitor_logs yedek de başarısız:', errText);
+        // Yine de kullanıcıya başarılı göster — veri Vercel loglarında
+      }
+
+    } catch (dbErr) {
+      console.error('[subscribe] Supabase bağlantı hatası:', dbErr.message);
+      // Supabase bağlanamadı ama veri Vercel loglarında (adım 4) zaten var
+    }
+  } else {
+    console.warn('[subscribe] Supabase env değişkenleri tanımsız — sadece Vercel loguna yazıldı');
   }
+
+  // Her durumda kullanıcıya başarılı mesajı ver
+  return res.status(200).json({ success: true });
 }
