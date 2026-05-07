@@ -112,39 +112,98 @@
     }
 
     /* ════════════════════════════════════════════════════════════════
-       CUSTOM CURSOR
+       CUSTOM CURSOR — MIX-BLEND-MODE INVERT
     ════════════════════════════════════════════════════════════════ */
     #cursor-dot,
     #cursor-ring {
       position: fixed;
-      border-radius: 50%;
       pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: opacity 0.3s;
+      z-index: 999999;
+      border-radius: 50%;
+      will-change: left, top, width, height;
     }
 
+    /* Precision dot — inverts whatever is under it */
     #cursor-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--c-blue-light);
-      box-shadow: 0 0 12px var(--c-blue-glow);
+      width: 10px;
+      height: 10px;
+      background: #ffffff;
+      mix-blend-mode: difference;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+                  width 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.3s;
     }
 
+    /* Trailing ring — subtle, elegant */
     #cursor-ring {
-      width: 38px;
-      height: 38px;
-      border: 1.5px solid rgba(59, 130, 246, 0.5);
-      transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo),
-        border-color 0.3s, background 0.3s;
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      background: transparent;
+      transform: translate(-50%, -50%);
+      transition:
+        width 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        height 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.3s,
+        background 0.3s,
+        opacity 0.3s;
     }
 
+    /* Hover — dot expands to fill ring area (magnetic morph) */
+    body:has(a:hover) #cursor-dot,
+    body:has(button:hover) #cursor-dot,
+    body:has(label:hover) #cursor-dot {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* Hover — ring shrinks and glows faintly */
     body:has(a:hover) #cursor-ring,
-    body:has(button:hover) #cursor-ring {
-      width: 56px;
-      height: 56px;
-      background: rgba(59, 130, 246, 0.08);
-      border-color: var(--c-blue-light);
+    body:has(button:hover) #cursor-ring,
+    body:has(label:hover) #cursor-ring {
+      width: 44px;
+      height: 44px;
+      border-color: rgba(255, 255, 255, 0.0);
+      background: transparent;
+    }
+
+    /* Click — sharp scale down snap */
+    #cursor-dot.clicking {
+      transform: translate(-50%, -50%) scale(0.5);
+    }
+    #cursor-ring.clicking {
+      width: 20px;
+      height: 20px;
+      border-color: rgba(255,255,255,0.8);
+    }
+
+    /* Ripple burst on click */
+    @keyframes cursor-ripple {
+      0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+    }
+    #cursor-ripple {
+      position: fixed;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.7);
+      pointer-events: none;
+      z-index: 999998;
+      opacity: 0;
+      transform: translate(-50%, -50%);
+    }
+    #cursor-ripple.burst {
+      animation: cursor-ripple 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Subscription box placeholder */
+    #subscriber-email::placeholder,
+    #subscriber-phone::placeholder {
+      color: rgba(255, 255, 255, 0.45);
+      font-style: italic;
     }
 
     /* ════════════════════════════════════════════════════════════════
@@ -1805,6 +1864,7 @@
   <!-- ──── CURSOR ──── -->
   <div id="cursor-dot"></div>
   <div id="cursor-ring"></div>
+  <div id="cursor-ripple"></div>
   <div class="bg-overlay"></div>
 
   <canvas id="webgl-canvas"></canvas>
@@ -3036,7 +3096,110 @@
       </a>
     </div>
 
-    <div style="margin-top:20px;font-size:11px;color:var(--c-text-dim);opacity:0.5;letter-spacing:0.1em;">
+    <!-- Email Subscription Box -->
+    <div style="max-width: 800px; width: 100%; padding: 40px; border-radius: 22px; margin-top: 30px; border: 1.5px solid rgba(59, 130, 246, 0.5); text-align: left; box-shadow: 0 0 60px rgba(37,99,235,0.25), 0 20px 60px rgba(0,0,0,0.9); position: relative; overflow: hidden; background: linear-gradient(135deg, #0a0f23 0%, #0d1530 50%, #0a0f23 100%);">
+      <!-- Blue glow top-right -->
+      <div style="position: absolute; top: -60px; right: -60px; width: 250px; height: 250px; background: radial-gradient(circle, rgba(37,99,235,0.35) 0%, transparent 70%); pointer-events: none;"></div>
+      <!-- Blue glow bottom-left -->
+      <div style="position: absolute; bottom: -40px; left: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, transparent 70%); pointer-events: none;"></div>
+
+      <div style="display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 2;">
+        <!-- Header row -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+          <div style="width: 3px; height: 28px; background: linear-gradient(180deg, #3b82f6, #60a5fa); border-radius: 2px; flex-shrink: 0;"></div>
+          <h3 style="font-family: var(--font-ui); font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #ffffff; margin: 0; text-shadow: 0 0 40px rgba(59,130,246,0.6), 0 2px 4px rgba(0,0,0,0.8);">
+            <span data-lang="tr">FIRSATLARDAN HABERDAR OLUN</span>
+            <span data-lang="en">STAY UPDATED WITH OPPORTUNITIES</span>
+          </h3>
+        </div>
+
+        <p style="font-size: 15px; color: #f1f5f9; line-height: 1.75; margin: 0 0 8px 0; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.6);">
+          <span data-lang="tr">Sadece sitemizi incelediğiniz için bazen kaçırılmayacak fırsatlar, güncellemeler ve özel teklifleri e-posta adresinize göndereceğiz. Asla spam yapmayız.</span>
+          <span data-lang="en">We will occasionally send exclusive offers, updates, and special opportunities directly to your email because you explored our site. No spam, ever.</span>
+        </p>
+
+        <form id="subscribe-form" onsubmit="handleSubscribe(event)" style="display: flex; flex-direction: column; gap: 14px; width: 100%;">
+          <!-- Row 1: Email + Phone -->
+          <div style="display: flex; gap: 12px; width: 100%; flex-wrap: wrap;">
+            <input type="email" id="subscriber-email" required
+              style="flex: 2; min-width: 220px; background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 10px; padding: 16px 22px; font-family: var(--font-body); font-size: 15px; color: #ffffff; outline: none; transition: all 0.3s; font-weight: 500;"
+              onfocus="this.style.borderColor='#60a5fa';this.style.background='rgba(59,130,246,0.15)';this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.2), 0 0 20px rgba(59,130,246,0.1)';"
+              onblur="this.style.borderColor='rgba(255,255,255,0.3)';this.style.background='rgba(255,255,255,0.07)';this.style.boxShadow='none';"
+              placeholder="E-posta / Email *">
+            <!-- Optional Phone (no badge) -->
+            <input type="tel" id="subscriber-phone"
+              style="flex: 1; min-width: 180px; background: rgba(255,255,255,0.07); border: 1.5px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 16px 22px; font-family: var(--font-body); font-size: 15px; color: #ffffff; outline: none; transition: all 0.3s; font-weight: 500;"
+              onfocus="this.style.borderColor='#60a5fa';this.style.background='rgba(59,130,246,0.12)';this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.15)';"
+              onblur="this.style.borderColor='rgba(255,255,255,0.2)';this.style.background='rgba(255,255,255,0.07)';this.style.boxShadow='none';"
+              placeholder="+90 5xx xxx xx xx">
+          </div>
+          <!-- Row 2: Subscribe button -->
+          <div>
+            <button type="submit" id="subscribe-btn" class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.3em; border-radius: 10px; cursor: none; transition: all 0.3s; box-shadow: 0 0 30px rgba(37,99,235,0.5);">
+              <span data-lang="tr">ABONE OL</span>
+              <span data-lang="en">SUBSCRIBE</span>
+            </button>
+          </div>
+
+          <!-- Legal Consent Checkbox -->
+          <label style="display: flex; align-items: flex-start; gap: 12px; cursor: none; user-select: none; background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px; padding: 12px 14px;">
+            <input type="checkbox" id="kvkk-consent" required style="margin-top: 1px; width: 18px; height: 18px; accent-color: #3b82f6; cursor: none; flex-shrink: 0;">
+            <span style="font-size: 13px; line-height: 1.6; color: #f1f5f9; font-family: var(--font-body); font-weight: 500;">
+              <span data-lang="tr"><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: #93c5fd; text-decoration: underline; font-weight: 700; transition: color 0.2s;" onmouseover="this.style.color='#bfdbfe'" onmouseout="this.style.color='#93c5fd'">Gizlilik Bilgilendirmesini</a> okudum, verilerimin bülten/fırsat gönderimi amacıyla işlenmesini kabul ediyorum. <span style="opacity:0.7;">(KVKK/GDPR Uyumlu)</span></span>
+              <span data-lang="en">I have read and agree to the <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: #93c5fd; text-decoration: underline; font-weight: 700; transition: color 0.2s;" onmouseover="this.style.color='#bfdbfe'" onmouseout="this.style.color='#93c5fd'">Privacy Notice</a> and consent to the processing of my data. <span style="opacity:0.7;">(GDPR/KVKK Compliant)</span></span>
+            </span>
+          </label>
+        </form>
+
+        <!-- Status Message -->
+        <div id="subscribe-status" style="font-family: var(--font-mono); font-size: 13px; margin-top: 4px; display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Privacy & Security Notice Link -->
+    <div style="margin-top: 25px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;">
+      <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: rgba(255, 255, 255, 0.5); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: color 0.3s;" onmouseover="this.style.color='var(--c-blue-light)'" onmouseout="this.style.color='rgba(255, 255, 255, 0.5)'">
+        <span>🛡️</span>
+        <span data-lang="tr">GİZLİLİK VE GÜVENLİK BİLGİLENDİRMESİ</span>
+        <span data-lang="en">PRIVACY AND SECURITY NOTICE</span>
+      </a>
+    </div>
+
+    <!-- Privacy Modal (Hidden by default) -->
+    <div id="privacy-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 99999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;">
+      <div class="glass" style="max-width: 600px; width: 90%; padding: 40px; border-radius: 24px; border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.8); position: relative; transform: scale(0.9); transition: transform 0.3s ease; text-align: left;">
+        <!-- Close Button -->
+        <button onclick="closePrivacyModal()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">×</button>
+        
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-family: var(--font-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.1em; color: var(--c-blue-light); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+          <span style="font-size: 20px;">🛡️</span>
+          <span data-lang="tr">GİZLİLİK VE GÜVENLİK BİLGİLENDİRMESİ</span>
+          <span data-lang="en">PRIVACY AND SECURITY NOTICE</span>
+        </div>
+        
+        <div style="font-size: 13px; line-height: 1.8; color: #ffffff; font-family: var(--font-body); max-height: 350px; overflow-y: auto; padding-right: 10px;">
+          <p style="margin-bottom: 15px;">
+            <span data-lang="tr">Sitemizi ziyaret ettiğinizde, sistem performansını izlemek ve güvenliği sağlamak amacıyla bazı teknik veriler (<strong>IP Adresi, Ülke, Şehir, Giriş Zamanı, Gerçekleştirilen Eylem ve Tarayıcı Bilgisi</strong>) otomatik olarak kaydedilmektedir.</span>
+            <span data-lang="en">When you visit our site, certain technical data (<strong>IP Address, Country, City, Entry Time, Action Performed, and User Agent</strong>) is automatically logged to monitor system performance and ensure security.</span>
+          </p>
+          <p style="margin-bottom: 15px; border-left: 3px solid var(--c-blue-light); padding-left: 15px; background: rgba(59, 130, 246, 0.05); padding-top: 10px; padding-bottom: 10px;">
+            <span data-lang="tr">Bu veriler <strong>kesinlikle üçüncü şahıslarla paylaşılmaz veya pazarlama (marketing) amacıyla kullanılmaz / satılmaz</strong>. Sadece site içi analizler için kullanılmaktadır.</span>
+            <span data-lang="en">This data is <strong>strictly never shared with third parties or used/sold for marketing purposes</strong>. It is processed solely for in-site performance optimization.</span>
+          </p>
+          <p>
+            <span data-lang="tr">Sitemizi ziyaret ettiğiniz ve incelediğiniz için teşekkür ederiz. Gelecekte sizlere özel fırsat mesajları, güncellemeler ve bültenler gönderebilmek adına e-posta adresinizi tamamen rızanız doğrultusunda talep etmekteyiz. Dilediğiniz zaman abonelikten çıkabilirsiniz.</span>
+            <span data-lang="en">Thank you for visiting and exploring our site. In the future, we may request your email address completely based on your explicit consent to send you special opportunity offers, updates, and newsletters. You can unsubscribe at any time.</span>
+          </p>
+        </div>
+
+        <button onclick="closePrivacyModal()" class="btn btn-primary" style="margin-top: 25px; width: 100%; padding: 14px; font-size: 11px; letter-spacing: 0.2em; border-radius: 8px;">
+          <span data-lang="tr">ANLADIM, KAPAT</span>
+          <span data-lang="en">I UNDERSTAND, CLOSE</span>
+        </button>
+      </div>
+    </div>
+
+    <div style="margin-top:30px;font-size:11px;color:var(--c-text-dim);opacity:0.5;letter-spacing:0.1em;">
       &copy; 2026 UTS PRO TITAN — ALL RIGHTS RESERVED | <a href="mailto:toprakahmetaydogmus0@gmail.com"
         style="color:inherit;text-decoration:none;">toprakahmetaydogmus0@gmail.com</a>
     </div>
@@ -3075,35 +3238,72 @@
       }
     })();
 
-    // ── 2. CUSTOM CURSOR ───────────────────────────────────────────
-    const cursorDot = document.getElementById('cursor-dot');
-    const cursorRing = document.getElementById('cursor-ring');
+    // ── 2. CUSTOM CURSOR — MIX-BLEND-MODE INVERT + RIPPLE ────────────
+    const cursorDot    = document.getElementById('cursor-dot');
+    const cursorRing   = document.getElementById('cursor-ring');
+    const cursorRipple = document.getElementById('cursor-ripple');
     let mouseX = 0, mouseY = 0;
-    let ringX = 0, ringY = 0;
+    let ringX  = 0, ringY  = 0;
+    let isVisible = false;
 
     document.addEventListener('mousemove', e => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+
+      // Dot snaps instantly — feels like native
       cursorDot.style.left = mouseX + 'px';
-      cursorDot.style.top = mouseY + 'px';
+      cursorDot.style.top  = mouseY + 'px';
+
+      if (!isVisible) {
+        isVisible = true;
+        ringX = mouseX;
+        ringY = mouseY;
+        cursorDot.style.opacity  = '1';
+        cursorRing.style.opacity = '1';
+      }
     });
 
+    // Ring trails with smooth spring
     (function animateCursor() {
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
+      const ease = 0.08;
+      ringX += (mouseX - ringX) * ease;
+      ringY += (mouseY - ringY) * ease;
       cursorRing.style.left = ringX + 'px';
-      cursorRing.style.top = ringY + 'px';
+      cursorRing.style.top  = ringY + 'px';
       requestAnimationFrame(animateCursor);
     })();
 
+    // Click — scale dot + fire ripple
+    document.addEventListener('mousedown', () => {
+      cursorDot.classList.add('clicking');
+      cursorRing.classList.add('clicking');
+
+      // Position and trigger ripple
+      cursorRipple.style.left = mouseX + 'px';
+      cursorRipple.style.top  = mouseY + 'px';
+      cursorRipple.classList.remove('burst');
+      void cursorRipple.offsetWidth; // reflow to restart animation
+      cursorRipple.classList.add('burst');
+    });
+    document.addEventListener('mouseup', () => {
+      cursorDot.classList.remove('clicking');
+      cursorRing.classList.remove('clicking');
+    });
+
     document.addEventListener('mouseleave', () => {
-      cursorDot.style.opacity = '0';
+      cursorDot.style.opacity  = '0';
       cursorRing.style.opacity = '0';
+      isVisible = false;
     });
     document.addEventListener('mouseenter', () => {
-      cursorDot.style.opacity = '1';
+      cursorDot.style.opacity  = '1';
       cursorRing.style.opacity = '1';
+      isVisible = true;
     });
+
+    // Start hidden
+    cursorDot.style.opacity  = '0';
+    cursorRing.style.opacity = '0';
 
     // ── 3. THREE.JS SCENE: PROFESSIONAL AMBIENCE ────────────────────
     (function () {
@@ -3382,6 +3582,85 @@
       setTimeout(() => { document.body.style.opacity = '1'; }, 250);
     }
 
+    async function handleSubscribe(event) {
+      event.preventDefault();
+      const emailInput = document.getElementById('subscriber-email');
+      const phoneInput = document.getElementById('subscriber-phone');
+      const consentCheckbox = document.getElementById('kvkk-consent');
+      const statusDiv = document.getElementById('subscribe-status');
+      const btn = document.getElementById('subscribe-btn');
+
+      if (!consentCheckbox.checked) {
+        statusDiv.style.color = 'var(--c-red)';
+        statusDiv.textContent = document.documentElement.classList.contains('lang-tr') 
+          ? '⚠ Lütfen onay kutusunu işaretleyin.' 
+          : '⚠ Please check the consent checkbox.';
+        statusDiv.style.display = 'block';
+        return;
+      }
+
+      const email = emailInput.value.trim();
+      if (!email) return;
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      statusDiv.style.color = 'var(--c-blue-light)';
+      statusDiv.textContent = document.documentElement.classList.contains('lang-tr') 
+        ? '⏳ Kaydediliyor...' 
+        : '⏳ Subscribing...';
+      statusDiv.style.display = 'block';
+
+      try {
+        const payload = { email };
+        if (phone) payload.phone = phone;
+
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          statusDiv.style.color = 'var(--c-emerald)';
+          statusDiv.textContent = document.documentElement.classList.contains('lang-tr') 
+            ? '✓ Başarıyla abone oldunuz! Teşekkür ederiz.' 
+            : '✓ Successfully subscribed! Thank you.';
+          emailInput.value = '';
+          if (phoneInput) phoneInput.value = '';
+          consentCheckbox.checked = false;
+        } else {
+          throw new Error(data.error || 'Subscription failed');
+        }
+      } catch (err) {
+        statusDiv.style.color = 'var(--c-red)';
+        statusDiv.textContent = document.documentElement.classList.contains('lang-tr') 
+          ? '❌ Bir hata oluştu, lütfen daha sonra tekrar deneyin.' 
+          : '❌ An error occurred, please try again later.';
+      } finally {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function openPrivacyModal() {
+      const modal = document.getElementById('privacy-modal');
+      const inner = modal.querySelector('.glass');
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'all';
+      inner.style.transform = 'scale(1)';
+    }
+
+    function closePrivacyModal() {
+      const modal = document.getElementById('privacy-modal');
+      const inner = modal.querySelector('.glass');
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+      inner.style.transform = 'scale(0.9)';
+    }
+
     // ── 12. MAGNETIC BUTTON EFFECT ─────────────────────────────────
     document.querySelectorAll('.btn').forEach(btn => {
       btn.addEventListener('mousemove', e => {
@@ -3591,7 +3870,7 @@
        ║   - Gracefully shielded with try-catch to protect UX.        ║
        ╚══════════════════════════════════════════════════════════════╝ -->
   <script type="text/javascript">
-    (function() {
+    (function () {
       try {
         var storageKey = window.atob("dmlzaXRlZF90b2RheQ=="); // 'visited_today'
         var apiEndpoint = window.atob("L2FwaS9sb2c=");      // '/api/log'
@@ -3602,18 +3881,18 @@
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
               action: window.atob("U2l0ZXllIEdpcmlzIFlhcGlsZGk=") // 'Siteye Giris Yapildi'
             })
           })
-          .then(function(res) {
-            if (res.ok) {
-              window.sessionStorage.setItem(storageKey, 'true');
-            }
-          })
-          .catch(function() {
-            // AdBlocker veya ağ kesintisi durumunda sessizce yutulur, hata fırlatmaz.
-          });
+            .then(function (res) {
+              if (res.ok) {
+                window.sessionStorage.setItem(storageKey, 'true');
+              }
+            })
+            .catch(function () {
+              // AdBlocker veya ağ kesintisi durumunda sessizce yutulur, hata fırlatmaz.
+            });
         }
       } catch (err) {
         // En eski tarayıcılarda bile sitenin çalışmasını bozmamak için tam koruma.
