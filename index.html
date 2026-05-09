@@ -3984,6 +3984,57 @@
     })();
   </script>
 
+  <!-- ╔══════════════════════════════════════════════════════════════╗
+       ║             CLERK AUTHENTICATION ENGINE v1.0                 ║
+       ║   - Github'da API anahtarı gizlemek için Vercel API kullanır ║
+       ╚══════════════════════════════════════════════════════════════╝ -->
+  <script>
+    window.addEventListener('load', async function () {
+      try {
+        // Vercel üzerinden gizli Clerk Anahtarını çekiyoruz
+        const configRes = await fetch('/api/config');
+        const config = await configRes.json();
+
+        if (!config.clerkPubKey) {
+          console.log("Sistem Log: Clerk anahtarı Vercel ortam değişkenlerinde bulunamadı.");
+          return;
+        }
+
+        // Clerk JS kütüphanesini dinamik olarak yüklüyoruz (Sayfayı yavaşlatmaz)
+        const script = document.createElement('script');
+        script.setAttribute('data-clerk-publishable-key', config.clerkPubKey);
+        script.async = true;
+        script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        script.crossOrigin = 'anonymous';
+
+        script.onload = async () => {
+          await window.Clerk.load();
+          
+          // Eğer kullanıcı giriş yapmışsa
+          if (window.Clerk.user) {
+            console.log("Kullanıcı zaten giriş yapmış:", window.Clerk.user.primaryEmailAddress.emailAddress);
+            if (window.app && window.app.logMessage) {
+              window.app.logMessage(`Hoş geldin, ${window.Clerk.user.firstName || window.Clerk.user.primaryEmailAddress.emailAddress}`, 'success');
+            }
+          } else {
+            // Sağ alt veya ortada çok şık bir giriş modalı (popup) aç
+            // İsterseniz 'openSignIn' yerine direkt sayfada göstermek için 'mountSignIn' kullanabilirsiniz.
+            setTimeout(() => {
+              window.Clerk.openSignIn({
+                forceRedirectUrl: window.location.href // Giriş yapınca aynı sayfada kalsın
+              });
+            }, 1000); // 1 saniye gecikmeyle popup olarak çıkar
+          }
+        };
+
+        document.body.appendChild(script);
+
+      } catch (err) {
+        console.error("Clerk entegrasyonu başlatılamadı:", err);
+      }
+    });
+  </script>
+
   <script defer src="/_vercel/insights/script.js"></script>
 </body>
 
