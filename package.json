@@ -1,0 +1,8 @@
+{
+  "name": "uts-pro-landing",
+  "version": "1.0.0",
+  "description": "UTS Pro Landing Page with Vercel Serverless Auth",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0"
+  }
+}
