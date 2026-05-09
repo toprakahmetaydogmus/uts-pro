@@ -3984,49 +3984,7 @@
     })();
   </script>
 
-  <!-- ╔══════════════════════════════════════════════════════════════╗
-       ║             CLERK AUTHENTICATION ENGINE v1.0                 ║
-       ║   - Github'da API anahtarı gizlemek için Vercel API kullanır ║
-       ╚══════════════════════════════════════════════════════════════╝ -->
-  <script>
-    window.addEventListener('load', async function () {
-      try {
-        // Doğrudan Publishable Key kullanıyoruz (Bu anahtarın açıkta olması %100 güvenlidir, Clerk dökümantasyonunda belirtilir)
-        const clerkPubKey = "pk_test_c3RhYmxlLW9yY2EtMzQuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
-        // Clerk JS kütüphanesini dinamik olarak yüklüyoruz (Sayfayı yavaşlatmaz)
-        const script = document.createElement('script');
-        script.setAttribute('data-clerk-publishable-key', clerkPubKey);
-        script.async = true;
-        script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-        script.crossOrigin = 'anonymous';
-
-        script.onload = async () => {
-          await window.Clerk.load();
-          
-          // Eğer kullanıcı giriş yapmışsa
-          if (window.Clerk.user) {
-            console.log("Kullanıcı zaten giriş yapmış:", window.Clerk.user.primaryEmailAddress.emailAddress);
-            if (window.app && window.app.logMessage) {
-              window.app.logMessage(`Hoş geldin, ${window.Clerk.user.firstName || window.Clerk.user.primaryEmailAddress.emailAddress}`, 'success');
-            }
-          } else {
-            // Sağ alt veya ortada çok şık bir giriş modalı (popup) aç
-            setTimeout(() => {
-              window.Clerk.openSignIn({
-                forceRedirectUrl: window.location.href // Giriş yapınca aynı sayfada kalsın
-              });
-            }, 1000); // 1 saniye gecikmeyle popup olarak çıkar
-          }
-        };
-
-        document.body.appendChild(script);
-
-      } catch (err) {
-        console.error("Clerk entegrasyonu başlatılamadı:", err);
-      }
-    });
-  </script>
 
   <script defer src="/_vercel/insights/script.js"></script>
 </body>
