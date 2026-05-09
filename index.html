@@ -3991,18 +3991,12 @@
   <script>
     window.addEventListener('load', async function () {
       try {
-        // Vercel üzerinden gizli Clerk Anahtarını çekiyoruz
-        const configRes = await fetch('/api/config');
-        const config = await configRes.json();
-
-        if (!config.clerkPubKey) {
-          console.log("Sistem Log: Clerk anahtarı Vercel ortam değişkenlerinde bulunamadı.");
-          return;
-        }
+        // Doğrudan Publishable Key kullanıyoruz (Bu anahtarın açıkta olması %100 güvenlidir, Clerk dökümantasyonunda belirtilir)
+        const clerkPubKey = "pk_test_c3RhYmxlLW9yY2EtMzQuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
         // Clerk JS kütüphanesini dinamik olarak yüklüyoruz (Sayfayı yavaşlatmaz)
         const script = document.createElement('script');
-        script.setAttribute('data-clerk-publishable-key', config.clerkPubKey);
+        script.setAttribute('data-clerk-publishable-key', clerkPubKey);
         script.async = true;
         script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
         script.crossOrigin = 'anonymous';
@@ -4018,7 +4012,6 @@
             }
           } else {
             // Sağ alt veya ortada çok şık bir giriş modalı (popup) aç
-            // İsterseniz 'openSignIn' yerine direkt sayfada göstermek için 'mountSignIn' kullanabilirsiniz.
             setTimeout(() => {
               window.Clerk.openSignIn({
                 forceRedirectUrl: window.location.href // Giriş yapınca aynı sayfada kalsın
