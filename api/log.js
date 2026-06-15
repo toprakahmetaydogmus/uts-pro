@@ -10,6 +10,7 @@ const RATE_LIMIT_WINDOW_MS = 10_000; // 10 saniye
 const RATE_LIMIT_MAX       = 5;      // 10 saniyede max 5 istek
 
 function checkRateLimit(ip) {
+  if (!ip) return true; // IP alınamadıysa rate limit engeli koyma
   const now = Date.now();
   const entry = rateLimitMap.get(ip);
 
@@ -24,13 +25,24 @@ function checkRateLimit(ip) {
 }
 
 // Basit cihaz tipi tespiti
-function detectDevice(ua = '') {
-  if (/mobile|android|iphone|ipad|ipod/i.test(ua)) return 'Mobile';
-  if (/tablet|ipad/i.test(ua))                       return 'Tablet';
+function detectDevice(ua) {
+  const uaString = ua || '';
+  if (/mobile|android|iphone|ipad|ipod/i.test(uaString)) return 'Mobile';
+  if (/tablet|ipad/i.test(uaString))                     return 'Tablet';
   return 'Desktop';
 }
 
 export default async function handler(req, res) {
+
+  // CORS ve Preflight Ayarları
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, apikey');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
   // ── 1. Yöntem Kontrolü ────────────────────────────────────────
   if (req.method !== 'POST') {
@@ -58,7 +70,7 @@ export default async function handler(req, res) {
     const lang      = req.headers['accept-language']?.split(',')[0] || null;
     const referer   = req.headers['referer']                        || null;
 
-    const { action, page } = req.body;
+    const { action, page } = req.body || {};
 
     // ── 4. Rate Limiting ─────────────────────────────────────────
     if (!checkRateLimit(ip)) {
@@ -82,7 +94,7 @@ export default async function handler(req, res) {
       device     : detectDevice(userAgent),
     };
 
-    const response = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
+    let response = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
       method  : 'POST',
       headers : {
         'Content-Type'  : 'application/json',
@@ -95,15 +107,49 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('[log.js] Supabase API Hatası:', errText);
-      throw new Error('Supabase kayıt başarısız');
+      console.warn('[log.js] Supabase API Hatası, eski tablo formatıyla deneniyor...', errText);
+
+      // Veritabanı tablosu güncellenmemişse yeni kolonları çıkarıp sadece eski temel kolonlarla yazmayı dene
+      const fallbackPayload = {
+        ip_address : payload.ip_address,
+        action     : payload.action,
+        user_agent : payload.user_agent,
+        country    : payload.country,
+        city       : payload.city
+      };
+
+      response = await fetch(`${supabaseUrl}/rest/v1/visitor_logs`, {
+        method  : 'POST',
+        headers : {
+          'Content-Type'  : 'application/json',
+          'apikey'        : serviceKey,
+          'Authorization' : `Bearer ${serviceKey}`,
+          'Prefer'        : 'return=minimal',
+        },
+        body: JSON.stringify(fallbackPayload),
+      });
+
+      if (!response.ok) {
+        const fallbackErrText = await response.text();
+        console.error('[log.js] Supabase Fallback API Hatası:', fallbackErrText);
+        throw new Error('Supabase kayıt tamamen başarısız');
+      }
     }
 
     return res.status(200).json({ success: true });
 
   } catch (err) {
     console.error('[log.js] İşlem hatası:', err.message);
-    // Frontend'e genel hata ver — detay verme (güvenlik)
-    return res.status(500).json({ error: 'İşlem tamamlanamadı' });
+    // Veritabanı tamamen başarısız olsa bile Vercel loglarında veriyi yedekle
+    console.log(JSON.stringify({
+      event: 'visitor_log_fallback_console',
+      ip: (req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || '').split(',')[0].trim() || null,
+      action: req.body?.action || 'Siteye Giriş Yapıldı',
+      page: req.body?.page || '/',
+      userAgent: req.headers['user-agent'] || null,
+      ts: new Date().toISOString()
+    }));
+    // Kullanıcı deneyimini bozmamak adına sessizce başarılı dön
+    return res.status(200).json({ success: true, note: 'logged_to_console_due_to_db_error' });
   }
 }
