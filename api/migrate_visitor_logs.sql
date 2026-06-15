@@ -23,6 +23,11 @@ ALTER TABLE visitor_logs
   ADD COLUMN IF NOT EXISTS page     text DEFAULT '/',
   ADD COLUMN IF NOT EXISTS device   text;
 
+-- Rol yetkilendirmelerini ekle (Supabase Yeni Güvenlik Güncellemesi - 30 Mayıs Sonrası)
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.visitor_logs TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.visitor_logs TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.visitor_logs TO service_role;
+
 -- RLS aktif et
 ALTER TABLE visitor_logs ENABLE ROW LEVEL SECURITY;
 
