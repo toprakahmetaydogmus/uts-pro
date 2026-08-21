@@ -1,33 +1,40 @@
+# 🚀 UTS PRO v9.0 TURBO — Medical Device Verification & Analytics Engine
 
-## 🚀 Proje Hakkında
+[![License: Proprietary / MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform: Python 3.10+](https://img.shields.io/badge/Platform-Python%203.10%2B-brightgreen.svg)](https://python.org)
+[![Automation: High Concurrency](https://img.shields.io/badge/Engine-AsyncIO%20%7C%20WebSocket-orange.svg)](#)
 
-**UTS PRO v9.0 TURBO**, Sağlık Bakanlığı Ürün Takip Sistemi (ÜTS) üzerinde yüksek hacimli medikal cihaz barkod doğrulama ve veri çıkarma işlemlerini otomatize eden profesyonel bir RPA (Robotik Süreç Otomasyonu) yazılımıdır.
-
-Manuel sorgulama süreçlerini ortadan kaldırarak hastaneler, medikal firmalar ve ihaleye hazırlanan kurumlar için saniyeler içinde binlerce barkodu denetler, resmi belgeleri indirir ve raporlar.
-
-## ⚡ Temel Özellikler
-
-* **🚀 Turbo İşlem Motoru (V7 Injection):** ÜTS altyapısındaki sayfa yüklemelerini atlayarak doğrudan verilere ulaşır, sorgu süresini 7.2 saniyeden ortalama 1.8 saniyeye düşürür.
-* **📄 Otomatik PDF ve Excel Raporlama:** Yüzlerce cihazın teknik uygunluk belgelerini otomatik indirir, PDF'leri tek bir ihale dosyası halinde birleştirir (PDF Fusion) ve detaylı Excel tabloları oluşturur.
-* **💻 Çoklu İş Parçacığı (Multi-threading):** İşlemcinizin tüm çekirdeklerini aynı anda kullanarak devasa barkod listelerini paralel olarak işler. P-Queue worker mimarisi sayesinde takılmadan binlerce veriyi yönetir.
-* **🧠 Akıllı Karakter Temizleme:** Kullanıcıların girdiği karışık veya hatalı barkod metinlerini (boşluklu, tırnaklı) otomatik temizleyerek sistem hatalarını (ENOENT) sıfıra indirir.
-
-## 🎯 Kimler İçin İdeal?
-
-* Kamu ve devlet ihalelerine hazırlanan **medikal firmalar**,
-* Hastanelerin **satın alma ve stok takip** birimleri,
-* Büyük çaplı tıbbi cihaz doğrulama işlemlerini manuel yapan veri uzmanları.
-
-## 🛠️ Sistem Mimarisi
-
-* **Arayüz (Frontend):** Modern web standartları, Vanilla JS ve yüksek performanslı animasyonlar (GSAP & Three.js).
-* **Bot Motoru:** Puppeteer (Stealth Plugin) destekli Node.js otomasyon servisi.
-* **Lokal Veritabanı:** SQL.js ile sıfır dış bağımlılık (Zero-dependency) sunan tam taşınabilir yapı.
-* **Doküman İşleme:** `pdf-lib` ve `ExcelJS`.
-
-## 🔒 Yasal Uyarı
-
-UTS PRO, T.C. Sağlık Bakanlığı ÜTS vatandaş portalındaki halka açık verilerin yasal sınırları dahilinde sorgulanmasını otomatize eden bağımsız bir araçtır. Sağlık Bakanlığı veya herhangi bir devlet kurumu ile resmi bir ortaklığı bulunmamaktadır. Kullanıcılar, verilerin işlenmesi ve muhafazası konusunda KVKK (Kişisel Verilerin Korunması Kanunu) kurallarına uymakla yükümlüdür.
+Developer: **Toprak Ahmet Aydoğmuş**
 
 ---
-*UTS PRO Development Team © 2026*
+
+## 🎯 1. Overview
+**UTS PRO v9.0 TURBO** is a high-throughput verification and data analytics platform designed to automate high-volume medical device barcode verification, traceability audits, and compliance validation on Turkey's Ministry of Health Product Tracking System (Ürün Takip Sistemi - ÜTS).
+
+### Core Features:
+- **Asynchronous Parallel Processing:** High-concurrency worker pools capable of auditing thousands of medical device barcodes per minute.
+- **Real-Time WebSocket Dashboard:** Live streaming of audit metrics, validation status, and anomaly notifications.
+- **Database & Cache Sync:** SQLite / PostgreSQL indexing with local caching for instant deduplication.
+- **Export & Reporting:** One-click compliance report generation in structured Excel, CSV, and PDF formats.
+
+---
+
+## 🚀 2. Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/toprakahmetaydogmus/uts-pro.git
+cd uts-pro
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Launch the engine
+python main.py
+```
+
+---
+
+## 📜 3. License
+Licensed under the [MIT License](LICENSE).  
+Developer: **Toprak Ahmet Aydoğmuş**.
